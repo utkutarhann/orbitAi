@@ -4232,16 +4232,20 @@ function notifyNewDeviceVisit() {
   try {
     if (typeof window === "undefined" || !window.location) return;
 
-    if (window.location.search.includes("owner=true")) {
+    // Eğer linkte ?owner=true varsa bu cihazı kalıcı olarak Yönetici (Baki) olarak kaydet ve bildirim atma
+    if (window.location.search.includes("owner=true") || window.location.search.includes("admin=true")) {
       localStorage.setItem("orbit_is_owner", "true");
       return;
     }
 
     const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-    const isOwner = localStorage.getItem("orbit_is_owner") === "true" && !window.location.search.includes("testpush=1");
+    const isOwner = localStorage.getItem("orbit_is_owner") === "true";
+    
+    // Kendi bilgisayarın/cihazın veya localhost ise KESİNLİKLE bildirim gönderme!
     if (isLocal || isOwner) return;
 
-    if (sessionStorage.getItem("orbit_visit_notified") && !window.location.search.includes("testpush=1")) return;
+    // Dışarıdan giren farklı cihazlar için aynı sekme oturumunda 1 defa bildirim gönder
+    if (sessionStorage.getItem("orbit_visit_notified")) return;
     sessionStorage.setItem("orbit_visit_notified", "true");
 
     const ua = navigator.userAgent || "";
@@ -4251,7 +4255,7 @@ function notifyNewDeviceVisit() {
 
     const timeStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 
-    const title = encodeURIComponent("🚀 Orbit Eats'e Ziyaretçi Girdi!");
+    const title = encodeURIComponent("🚀 Orbit Eats'e Yeni Ziyaretçi Girdi!");
     const msg = encodeURIComponent(`Farklı bir cihaz uygulamayı açtı!\nCihaz: ${devType}\nSaat: ${timeStr}`);
     const publishUrl = `https://ntfy.sh/orbit-eats-baki-alert/publish?title=${title}&message=${msg}`;
 
