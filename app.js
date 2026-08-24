@@ -380,7 +380,6 @@ function openScenarioPicker() {
       <div class="scenario-picker-header">
         <p class="scenario-picker-title">Senaryo Seçici</p>
         <p class="scenario-picker-sub">Kullanıcıya özel günün farklı zaman dilimleri ve özel günlere farklılaşan deneyim için seçim yap Baki :)</p>
-        <button class="scenario-picker-close" id="scenarioPickerClose">✕</button>
       </div>
       <div class="scenario-picker-list">
         ${scenarios.map(s => `
@@ -399,7 +398,8 @@ function openScenarioPicker() {
   sheet.addEventListener("click", (e) => {
     if (e.target === sheet) closeScenarioPicker();
   });
-  document.getElementById("scenarioPickerClose").addEventListener("click", closeScenarioPicker);
+  const scClose = document.getElementById("scenarioPickerClose");
+  if (scClose) scClose.addEventListener("click", closeScenarioPicker);
 
   sheet.querySelectorAll("[data-scenario]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -445,7 +445,6 @@ function openBirthdayRewardModal() {
       <div class="scenario-picker-header">
         <p class="scenario-picker-title">🎁 Bugün Senin Günün! ✨</p>
         <p class="scenario-picker-sub">Orbit AI geçmiş tercihlerine baktı ve sana en uygun hediyeleri hazırladı. Kutlamayı başlatmak için birini seç:</p>
-        <button class="scenario-picker-close" id="birthdayRewardClose">✕</button>
       </div>
       <div class="birthday-reward-options" style="padding: 16px;">
         <button class="birthday-reward-card" id="reward50Pct">
@@ -474,7 +473,8 @@ function openBirthdayRewardModal() {
   sheet.addEventListener("click", (e) => {
     if (e.target === sheet) closeBirthdayRewardModal();
   });
-  document.getElementById("birthdayRewardClose").addEventListener("click", closeBirthdayRewardModal);
+  const bdayClose = document.getElementById("birthdayRewardClose");
+  if (bdayClose) bdayClose.addEventListener("click", closeBirthdayRewardModal);
 
   const selectGift = (giftName) => {
     closeBirthdayRewardModal();
@@ -1385,9 +1385,15 @@ function renderPreferences() {
             </div>
 
             <div class="tier-tabs-row">
-              ${["Base", "Plus", "Prime"].map(t => `
-                <button class="tier-tab-pill ${t === tb.tier ? "active is-current" : ""}" data-tier="${t.toLowerCase()}">${t === "Base" ? "" : "✦ "}${t}</button>
-              `).join("")}
+              ${["Base", "Plus", "Prime"].map(t => {
+                const isCurrent = t === tb.tier;
+                return `
+                  <div class="tier-tab-wrapper ${isCurrent ? "is-current-wrapper" : ""}">
+                    ${isCurrent ? '<span class="current-tier-badge">✓ MEVCUT PLAN</span>' : ""}
+                    <button class="tier-tab-pill ${isCurrent ? "active is-current" : ""}" data-tier="${t.toLowerCase()}">${t === "Base" ? "" : "✦ "}${t}${isCurrent ? " ✓" : ""}</button>
+                  </div>
+                `;
+              }).join("")}
             </div>
 
             <div class="tier-section-block">
@@ -3934,7 +3940,6 @@ function renderCollectionPage(key) {
         <div class="tier-modal-content">
           <div class="tier-modal-header">
             <h3>⇅ Sıralama Seçenekleri</h3>
-            <button class="modal-close-btn" id="closeSortModal">✕</button>
           </div>
           <div class="tier-modal-body">
             <div class="modal-radio-list">
@@ -3963,7 +3968,6 @@ function renderCollectionPage(key) {
         <div class="tier-modal-content">
           <div class="tier-modal-header">
             <h3>🍲 Mutfaklar (Cuisines)</h3>
-            <button class="modal-close-btn" id="closeCuisineModal">✕</button>
           </div>
           <div class="tier-modal-body">
             <div class="cuisines-grid">
@@ -3995,7 +3999,6 @@ function renderCollectionPage(key) {
         <div class="tier-modal-content">
           <div class="tier-modal-header">
             <h3>🌱 Beslenme & Filtreler</h3>
-            <button class="modal-close-btn" id="closePrefsModal">✕</button>
           </div>
           <div class="tier-modal-body">
 
