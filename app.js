@@ -4227,4 +4227,36 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
   if (pay) pay.addEventListener("click", (e) => { e.stopPropagation(); handoff("Pay", "pay"); });
 })();
 
+/* ---------------- Push Notification for New Device Visits ---------------- */
+function notifyNewDeviceVisit() {
+  try {
+    if (typeof window === "undefined" || !window.location) return;
+
+    if (window.location.search.includes("owner=true") || window.location.search.includes("admin=true")) {
+      localStorage.setItem("orbit_is_owner", "true");
+    }
+
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const isOwner = localStorage.getItem("orbit_is_owner") === "true";
+    if (isLocal || isOwner) return;
+
+    if (sessionStorage.getItem("orbit_visit_notified")) return;
+    sessionStorage.setItem("orbit_visit_notified", "true");
+
+    const ua = navigator.userAgent || "";
+    let devType = "Bilgisayar (PC/Mac)";
+    if (/iPhone|iPad|iPod/i.test(ua)) devType = "📱 iPhone / iOS";
+    else if (/Android/i.test(ua)) devType = "🤖 Android Cihaz";
+
+    const timeStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+
+    fetch("https://ntfy.sh/orbit-eats-baki-alert", {
+      method: "POST",
+      headers: { "Title": "🚀 Orbit Eats'e Yeni Ziyaretçi Girdi!" },
+      body: `Farklı bir cihaz uygulamayı açtı!\nCihaz: ${devType}\nSaat: ${timeStr}`
+    }).catch(() => {});
+  } catch (e) {}
+}
+
+notifyNewDeviceVisit();
 bootstrap();
