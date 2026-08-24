@@ -4232,29 +4232,32 @@ function notifyNewDeviceVisit() {
   try {
     if (typeof window === "undefined" || !window.location) return;
 
-    if (window.location.search.includes("owner=true") || window.location.search.includes("admin=true")) {
+    if (window.location.search.includes("owner=true")) {
       localStorage.setItem("orbit_is_owner", "true");
+      return;
     }
 
     const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-    const isOwner = localStorage.getItem("orbit_is_owner") === "true";
+    const isOwner = localStorage.getItem("orbit_is_owner") === "true" && !window.location.search.includes("testpush=1");
     if (isLocal || isOwner) return;
 
-    if (sessionStorage.getItem("orbit_visit_notified")) return;
+    if (sessionStorage.getItem("orbit_visit_notified") && !window.location.search.includes("testpush=1")) return;
     sessionStorage.setItem("orbit_visit_notified", "true");
 
     const ua = navigator.userAgent || "";
-    let devType = "Bilgisayar (PC/Mac)";
+    let devType = "Bilgisayar";
     if (/iPhone|iPad|iPod/i.test(ua)) devType = "📱 iPhone / iOS";
     else if (/Android/i.test(ua)) devType = "🤖 Android Cihaz";
 
     const timeStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 
-    fetch("https://ntfy.sh/orbit-eats-baki-alert", {
-      method: "POST",
-      headers: { "Title": "🚀 Orbit Eats'e Yeni Ziyaretçi Girdi!" },
-      body: `Farklı bir cihaz uygulamayı açtı!\nCihaz: ${devType}\nSaat: ${timeStr}`
-    }).catch(() => {});
+    const title = encodeURIComponent("🚀 Orbit Eats'e Ziyaretçi Girdi!");
+    const msg = encodeURIComponent(`Farklı bir cihaz uygulamayı açtı!\nCihaz: ${devType}\nSaat: ${timeStr}`);
+    const publishUrl = `https://ntfy.sh/orbit-eats-baki-alert/publish?title=${title}&message=${msg}`;
+
+    fetch(publishUrl, { method: "GET", mode: "no-cors" }).catch(() => {});
+    const beacon = new Image();
+    beacon.src = publishUrl;
   } catch (e) {}
 }
 
