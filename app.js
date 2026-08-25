@@ -237,7 +237,7 @@ const SCENARIO_DEFS = {
     label: "☀️ Sabah Saatleri",
     gradient: "linear-gradient(145deg, #064E3B 0%, #0F766E 50%, #0D9488 100%)",
     greeting: "Günaydın, Baki ☀️",
-    sub: "Güne taze ve enerjik başlayalım. Fırından yeni çıkmış çıtır lezzetler hazır.",
+    sub: "Güne taze ve enerjik bir başlangıç yap. Fırından yeni çıkmış çıtır lezzetler senin için hazır.",
     badge: { cls: "plus", label: "✦ PLUS ÜYE" },
     swipeRail: true,  // Ana içerikte swipe edilebilir restoran önerileri göster
     aiMessage: "Yukarıdaki seçeneklerin sana uygun olabileceğini düşündüm. Değilse bana nasıl bir şeyler yemek istediğini söyleyebilirsin.",
