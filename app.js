@@ -2314,17 +2314,17 @@ function renderTracking() {
           <p class="screen-title">Sipariş Takibi</p>
         </div>
       </div>
-      <div class="eta-card ${d.delayMin > 0 ? "has-delay" : ""}">
+      <div class="eta-card ${d.delayMin >= 5 ? "has-delay" : ""}">
         <div class="eta-headline">
           <div class="eta-big"><span id="etaMinVal">${remainingMin()}</span><small>dk</small></div>
           <div class="eta-meta">
             <p class="eta-clock">Tahmini teslim <strong id="etaClock">${deliveryClock()}</strong></p>
-            ${d.delayMin > 0
+            ${d.delayMin >= 5
               ? `<span class="eta-delay-badge">${d.delayMin} dk gecikme</span>`
               : `<span class="eta-ontime-badge">Zamanında</span>`}
           </div>
         </div>
-        ${d.delayMin > 0 ? `
+        ${d.delayMin >= 5 ? `
           <div class="eta-delay-strip">
             <p class="eds-reason">${d.signals.find(s => s.id === "traffic").label.split("·")[1].trim()} yoğun ve yağmur var — kurye yolda, takipteyim.</p>
             <div class="eds-comp">
@@ -2403,8 +2403,8 @@ function renderTracking() {
     }
   });
 
-  // Kupon kullanıcı aksiyonu beklemeden, gecikme oluştuğu anda tanımlanır
-  if (d.delayMin > 0 && !STATE.delivery.compensated) {
+  // Kupon kullanıcı aksiyonu beklemeden, 5+ dk gecikme algılandığı anda otomatik tanımlanır
+  if (d.delayMin >= 5 && !STATE.delivery.compensated) {
     STATE.delivery.compensated = true;
     STATE.coupons = STATE.coupons || [];
     STATE.coupons.push({
@@ -2413,7 +2413,7 @@ function renderTracking() {
       reason: "Teslimat gecikmesi telafisi",
       validForNextOrder: true
     });
-    toast(`${tl(DELAY_COUPON_TRY)} indirim kuponu hesabına tanımlandı.`);
+    toast(`${tl(DELAY_COUPON_TRY)} indirim kuponu hesabına otomatik tanımlandı.`);
   }
 
   clearInterval(STATE.etaTimer);
