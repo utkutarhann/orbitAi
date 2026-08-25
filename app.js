@@ -164,8 +164,8 @@ function getMoments() {
   const dietLabels = mappedProfilePrefLabels();
   const beslenmeCard = {
     id: "beslenme", badge: "BESLENME TERCİHİN",
-    title: "Sana uygun olanlar",
-    sub: "Sana özel hazırlanan içeriklere göz at",
+    title: "Sana Özel Seçimler",
+    sub: "Beslenme alışkanlıklarına sadık lezzet rehberi",
     emoji: "🥗", tone: "diet",
     action: "diet",
     prompt: "Beslenme tercihlerime uygun bir şey öner"
