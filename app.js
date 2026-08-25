@@ -4268,5 +4268,59 @@ function notifyNewDeviceVisit() {
   } catch (e) {}
 }
 
+/* ---------------- Mobile Release Note Pop-up Modal ---------------- */
+function checkMobileReleaseNoteModal() {
+  try {
+    if (typeof window === "undefined") return;
+
+    const isMobileDevice = window.innerWidth <= 600 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || "");
+    if (!isMobileDevice) return;
+
+    if (sessionStorage.getItem("orbit_mobile_release_shown")) return;
+
+    setTimeout(() => {
+      if (sessionStorage.getItem("orbit_mobile_release_shown")) return;
+      sessionStorage.setItem("orbit_mobile_release_shown", "true");
+
+      const modal = document.createElement("div");
+      modal.className = "tier-modal-overlay mobile-release-overlay";
+      modal.innerHTML = `
+        <div class="mobile-release-card bottom-sheet-panel open">
+          <div class="scenario-picker-handle"></div>
+          <div class="mrc-icon">📱✨</div>
+          <p class="mrc-tag">RELEASE NOTE</p>
+          <h3 class="mrc-title">Tam mobil uyumluluk sağlandı. :)</h3>
+          <p class="mrc-sub">Orbit Eats artık mobil cihazında kusursuz ve tam ekran deneyim sunuyor.</p>
+          <div class="mrc-actions">
+            <button class="mrc-btn primary" id="mrcOkBtn">Tamam</button>
+            <button class="mrc-btn secondary" id="mrcCloseBtn">Kapat</button>
+          </div>
+        </div>
+      `;
+
+      const shell = document.querySelector(".app-shell") || document.body;
+      shell.appendChild(modal);
+
+      requestAnimationFrame(() => {
+        modal.style.display = "flex";
+      });
+
+      const closeModal = () => {
+        const card = modal.querySelector(".mobile-release-card");
+        if (card) card.classList.remove("open");
+        modal.style.opacity = "0";
+        setTimeout(() => modal.remove(), 300);
+      };
+
+      document.getElementById("mrcOkBtn").addEventListener("click", closeModal);
+      document.getElementById("mrcCloseBtn").addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+    }, 600);
+  } catch (e) {}
+}
+
 notifyNewDeviceVisit();
+checkMobileReleaseNoteModal();
 bootstrap();
