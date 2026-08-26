@@ -885,7 +885,17 @@ function passesProfileDiet(item) {
 
 function aiSearch(query) {
   if (!query || !query.trim()) return [];
-  const catalog = buildMenuCatalog().filter(passesProfileDiet);
+  const fullCatalog = buildMenuCatalog();
+  const qNorm = normalizeTerm(query);
+
+  // Arama terimi doğrudan bir restoran veya lokanta adıyla eşleşiyor mu?
+  const matchesRestaurantDirectly = fullCatalog.some(it => {
+    const rName = normalizeTerm(it.restaurantName);
+    return rName.includes(qNorm) || qNorm.includes(rName) || qNorm.split(/\s+/).some(t => t.length >= 3 && rName.includes(t));
+  });
+
+  // Restoran aramalarında profil diyet kısıtını kaldır ki aranan lokanta menüsü gizlenmesin
+  const catalog = matchesRestaurantDirectly ? fullCatalog : fullCatalog.filter(passesProfileDiet);
   const signals = parseQuerySignals(query);
   const isSignalSearch = !!(signals.diet || signals.maxBudget || signals.spice || signals.weight);
 
