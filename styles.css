@@ -2624,7 +2624,7 @@ body {
   z-index: 50;
   display: flex;
   align-items: flex-end;
-  padding-top: 14px;
+  padding-top: 52px;
   /* fadeIn translateY içerdiği için overlay'i 10px aşağı kaydırıyordu — sadece opacity */
   animation: overlayFade 0.2s ease;
 }
@@ -2634,19 +2634,14 @@ body {
 }
 .tier-modal-content {
   width: 100%;
-  /* Yüzde, kapsayan app-shell'e göre ölçer; vh tarayıcı penceresini ölçtüğü
-     için sheet telefon kabuğunun dışına taşıyordu. 100% => kısa sheet'ler
-     içeriği kadar kalır, uzun içerik (Avantajlar) ekranı tam doldurur. */
-  max-height: 100%;
+  max-height: calc(100% - 52px) !important;
   background: #ffffff;
   color: var(--orbit-ink);
   border-radius: 28px 28px 0 0;
   padding: 0 18px 22px;
   overflow-y: auto;
-  /* Üst kenar çizgisi koyu hero'lu sheet'lerde köşelerde beyaz kavis bırakıyordu */
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
   animation: sheetUp 0.26s cubic-bezier(.2, .8, .2, 1);
-  /* Kendi yığın bağlamı: overlay'in backdrop-filter'ı olmadan sheet yarı saydam görünüyordu */
   position: relative;
   z-index: 1;
   isolation: isolate;
@@ -4107,11 +4102,11 @@ body {
   /* tier-modal-content padding'ini (10px 18px) iptal edip kenarlara yasla */
   margin: 0 -18px 16px -18px;
   border-radius: 28px 28px 22px 22px;
-  padding: 32px 18px 20px;
+  padding: 24px 18px 20px;
 }
 .modal-close-btn.on-card {
   position: absolute;
-  top: 18px;
+  top: 14px;
   left: 14px;
   right: auto;
   background: rgba(255, 255, 255, 0.16);
