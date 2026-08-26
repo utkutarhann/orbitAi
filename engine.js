@@ -487,8 +487,8 @@ function getTimeSegment(hour) {
 
 const TIER_THRESHOLDS = {
   Base:  { minSpend90d: 0,     requiresKyc: false, requiresPayWallet: false },
-  Plus:  { minSpend90d: 5000,  requiresKyc: true },
-  Prime: { minSpend90d: 10000, requiresKyc: true, minTenureDays: 365, minStandingOrders: 1 }
+  Plus:  { minSpend90d: 7500,  requiresKyc: true },
+  Prime: { minSpend90d: 15000, requiresKyc: true, minTenureDays: 365, minStandingOrders: 1 }
 };
 
 const BASE_ACTIVITY_THRESHOLD = 2500;
@@ -503,7 +503,7 @@ const CASHBACK_RATES = {
 };
 
 const STANDARD_DELIVERY_FEE = 19.9;
-const PLUS_FREE_DELIVERY_MIN = 600;
+const PLUS_FREE_DELIVERY_MIN = 750;
 
 function getTenureDays(user) {
   const created = user && user.orbitGrow && user.orbitGrow.accountCreatedAt;
@@ -874,7 +874,8 @@ function aiSearch(query) {
 }
 
 /* İade, sepetin yüzdesi değil sorunlu kalemin gerçek tutarıdır.
-   Geç teslimatta ürün sorunu yoktur; iade edilen şey teslimat ücretidir. */
+   Geç teslimatta ürün sorunu yoktur; iade edilen şey teslimat ücretidir.
+   AI yalnızca kesin olduğunda karar verir, belirsizlik insana gider. */
 function resolveIssue(issueType, order, issueItemName) {
   const o = order || {};
   const orderTotal = o.totalTRY || 0;
@@ -883,6 +884,7 @@ function resolveIssue(issueType, order, issueItemName) {
 
   if (issueType === "geç teslimat") {
     return {
+      outcome: "auto_refund",
       issueType, basis: "delivery_fee", itemName: null, orderTotal,
       refundAmount: STANDARD_DELIVERY_FEE,
       explanation: `Siparişin geciktiği için ${tl(STANDARD_DELIVERY_FEE)} teslimat ücretini iade edebilirim.`
@@ -896,21 +898,24 @@ function resolveIssue(issueType, order, issueItemName) {
     kalem = kalemler.find(i => i.name.toLocaleLowerCase("tr").includes(q) ||
                                q.includes(i.name.toLocaleLowerCase("tr")));
   }
+
+  // Ürün net ayırt edildiyse otomatik iade yap
   if (kalem) {
     const tutar = Math.min(Math.round(kalem.price * kalem.qty * 100) / 100, tavan);
     return {
+      outcome: "auto_refund",
       issueType, basis: "item_price", itemName: kalem.name, orderTotal,
       refundAmount: tutar,
       explanation: `${kalem.name} karşılığı olarak ${tl(tutar)} iade edilebilir.`
     };
   }
 
-  // Ayırt edilemedi: eksik ürün karşılığı kısmi iade, tavanın altında kalır
-  const tutar = Math.min(Math.round(orderTotal * FALLBACK_REFUND_RATIO), tavan);
+  // Ürün ayırt edilemediğinde %40 kısmi iade kaldırıldı — belirsizlik durumunda dosya insan temsilciye aktarılır
   return {
-    issueType, basis: "partial", itemName: null, orderTotal,
-    refundAmount: tutar,
-    explanation: `Eksik ürün karşılığı olarak ${tl(tutar)} iade edilebilir.`
+    outcome: "escalate_human",
+    issueType, basis: "unmatched", itemName: null, orderTotal,
+    refundAmount: 0,
+    explanation: "Fotoğraftaki sorunlu ürün net ayırt edilemediği için dosya müşteri temsilcisine aktarıldı."
   };
 }
 /* ================= Sipariş Desteği — Gemini ================= */
@@ -1112,10 +1117,9 @@ function localSupportReply(userText, ctx) {
    yemek/sipariş görseli değilse iade yok; 1.000 TL ve üzeri siparişte otomatik
    iade yapılmaz, dosya çağrı merkezine devredilir. */
 const AUTO_REFUND_ORDER_CAP_TRY = 1000;
-/* İade hiçbir durumda sipariş tutarının %80'ini aşmaz; ürün ayırt
-   edilemediğinde eksik ürün karşılığı olarak %40 önerilir. */
+/* İade hiçbir durumda sipariş tutarının %80'ini aşmaz.
+   Ürün ayırt edilemediğinde %40 iade silindi — dosya insan temsilciye aktarılır. */
 const MAX_REFUND_RATIO = 0.8;
-const FALLBACK_REFUND_RATIO = 0.4;
 
 function decidePhotoClaim(vision, order, issueType) {
   const orderTotal = (order && order.totalTRY) || 0;
@@ -1128,10 +1132,13 @@ function decidePhotoClaim(vision, order, issueType) {
     return { outcome: "irrelevant_photo", vision };
   }
   if (orderTotal >= AUTO_REFUND_ORDER_CAP_TRY) {
-    return { outcome: "escalate_human", vision, orderTotal };
+    return { outcome: "escalate_human", vision, orderTotal, reason: "order_cap_exceeded" };
   }
-  return Object.assign({ outcome: "auto_refund", vision },
-    resolveIssue(issueType, order, vision.issueItem));
+  if (!vision.issueItem) {
+    return { outcome: "escalate_human", vision, orderTotal, reason: "item_unclear" };
+  }
+  const result = resolveIssue(issueType, order, vision.issueItem);
+  return Object.assign({ vision }, result);
 }
 
 async function analyzePhotoEvidence(base64, mimeType, order) {

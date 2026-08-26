@@ -1250,28 +1250,26 @@ const USER = {
     "accountCreatedAt": "2025-12-20",
     "currentMonth": "Ağustos 2026",
     "daysLeftInMonth": 13,
-    "cashbackEarned90d": 412.5,
+    "cashbackEarned90d": 270.0,
     /* Son 90 günün haftalık nakit iade dökümü — profildeki mini grafiği besler.
-       Toplamı cashbackEarned90d ile birebir eşleşir. */
-    /* Haftalar pazartesi başlangıçlıdır; etiketler tarihten türetilir.
-       Toplam, orbitGrow.cashbackEarned90d ile birebir aynı olmalıdır. */
+       Toplamı cashbackEarned90d ile birebir eşleşir (9.000 TL x %3 = 270,00 TL). */
     "cashbackWeekly": [
-      { "start": "2026-06-01", "amount": 18.4 },
-      { "start": "2026-06-08", "amount": 26.1 },
-      { "start": "2026-06-15", "amount": 12.0 },
-      { "start": "2026-06-22", "amount": 34.7 },
-      { "start": "2026-06-29", "amount": 29.3 },
-      { "start": "2026-07-06", "amount": 41.6 },
-      { "start": "2026-07-13", "amount": 22.8 },
-      { "start": "2026-07-20", "amount": 37.2 },
-      { "start": "2026-07-27", "amount": 52.4 },
-      { "start": "2026-08-03", "amount": 44.9 },
-      { "start": "2026-08-10", "amount": 48.3 },
-      { "start": "2026-08-17", "amount": 44.8 }
+      { "start": "2026-06-01", "amount": 12.0 },
+      { "start": "2026-06-08", "amount": 17.1 },
+      { "start": "2026-06-15", "amount": 7.9 },
+      { "start": "2026-06-22", "amount": 22.7 },
+      { "start": "2026-06-29", "amount": 19.2 },
+      { "start": "2026-07-06", "amount": 27.2 },
+      { "start": "2026-07-13", "amount": 14.9 },
+      { "start": "2026-07-20", "amount": 24.3 },
+      { "start": "2026-07-27", "amount": 34.3 },
+      { "start": "2026-08-03", "amount": 29.4 },
+      { "start": "2026-08-10", "amount": 31.6 },
+      { "start": "2026-08-17", "amount": 29.4 }
     ],
     "rolling90DaySpend": {
-      "totalAnyMethod": 7420,
-      "payWalletOnly": 6140
+      "totalAnyMethod": 11000,
+      "payWalletOnly": 9000
     },
     "monthlyUnconditionalRefund": {
       "usedThisMonth": false,

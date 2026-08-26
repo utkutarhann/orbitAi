@@ -2869,27 +2869,38 @@ async function processIssuePhoto(file) {
       setIssueQuickChips(["Yeni fotoğraf ekleyeyim", "Destek ekibine aktar"]);
 
     } else if (karar.outcome === "escalate_human") {
+      let textMsg = "";
+      let checks = [];
+
+      if (karar.reason === "no_vision") {
+        textMsg = `Gönderdiğin fotoğrafı şu an inceleyemedim, bu yüzden talebi kendi başıma sonuçlandırmıyorum. Dosyanı fotoğrafınla birlikte destek ekibimize aktarıyorum; kısa süre içinde seninle iletişime geçecekler.`;
+        checks = [
+          { label: "Görüntü doğrulaması", detail: "Görsel analizi tamamlanamadı", ok: false },
+          { label: "Otomatik iade", detail: "Doğrulanmamış kanıtla otomatik iade yapılmaz", ok: false }
+        ];
+      } else if (karar.reason === "item_unclear") {
+        textMsg = `Fotoğrafı inceledim ancak sorunlu ürünü fotoğraftan net olarak ayırt edemedim. Orbit AI yalnızca kesin olduğunda otomatik iade kararı verir, belirsizlik durumunda karar insana aktarılır. Dosyanı destek ekibimize aktarıyorum.`;
+        checks = [
+          { label: "Görüntü doğrulandı", detail: (vision && vision.description) || "Görsel incelendi", ok: true },
+          { label: "Ürün eşleşmesi", detail: "Fotoğraftaki ürün net ayırt edilemedi", ok: false },
+          { label: "Otomatik iade kararı", detail: "Belirsizlik durumunda otomatik para iadesi yapılmaz", ok: false }
+        ];
+      } else {
+        textMsg = `Fotoğrafı inceledim, anlattığınla örtüşüyor. Ancak sipariş tutarı ${tl(orderTotal)} (≥ 1.000 TL) olduğu için bu talebi otomatik sonuçlandırma yetkim yok — dosyanı tüm kanıtlarla birlikte destek ekibimize aktarıyorum. Ekibimiz kısa süre içinde seninle iletişime geçecek.`;
+        checks = [
+          { label: "Görüntü doğrulandı", detail: (vision && vision.description) || "Sipariş içeriği görünüyor", ok: true },
+          { label: "Sipariş eşleşmesi", detail: `"${issueType}" ile tutarlı`, ok: true },
+          { label: "Otomatik iade sınırı", detail: `${tl(orderTotal)} · ${tl(AUTO_REFUND_ORDER_CAP_TRY)} ve üzeri talepler ekibe aktarılır`, ok: false }
+        ];
+      }
+
       STATE.issueChat.messages.push({
         role: "assistant",
-        text: karar.reason === "no_vision"
-          ? `Gönderdiğin fotoğrafı şu an inceleyemedim, bu yüzden talebi kendi başıma sonuçlandırmıyorum. ` +
-            `Dosyanı fotoğrafınla birlikte destek ekibimize aktarıyorum; kısa süre içinde seninle iletişime geçecekler.`
-          : `Fotoğrafı inceledim, anlattığınla örtüşüyor. Sipariş tutarı ${tl(orderTotal)} olduğu için ` +
-            `bu talebi otomatik sonuçlandırma yetkim yok — dosyanı tüm kanıtlarla birlikte destek ekibimize aktarıyorum. ` +
-            `Ekibimiz kısa süre içinde seninle iletişime geçecek, süreci buradan da takip edebilirsin.`,
-        checks: karar.reason === "no_vision"
-          ? [
-              { label: "Görüntü doğrulaması", detail: "Görsel analizi tamamlanamadı", ok: false },
-              { label: "Otomatik iade", detail: "Doğrulanmamış kanıtla otomatik iade yapılmaz", ok: false }
-            ]
-          : [
-              { label: "Görüntü doğrulandı", detail: (vision && vision.description) || "Sipariş içeriği görünüyor", ok: true },
-              { label: "Sipariş eşleşmesi", detail: `"${issueType}" ile tutarlı`, ok: true },
-              { label: "Otomatik iade sınırı", detail: `${tl(orderTotal)} · ${tl(AUTO_REFUND_ORDER_CAP_TRY)} üzeri talepler ekibe aktarılır`, ok: false }
-            ],
+        text: textMsg,
+        checks,
         escalated: true
       });
-      setIssueQuickChips(["Ne kadar sürer?", "Siparişi tekrarla"]);
+      setIssueQuickChips(["Temsilciye bağlan", "Siparişi tekrarla"]);
 
     } else {
       const ai = await callGeminiSupport("", supportContext({
