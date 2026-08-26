@@ -1168,7 +1168,7 @@ function tierConditionsHTML(tier) {
     const left = Math.max(0, opts.target - opts.now);
     return `
       <div class="tier-condition-item ${done ? "completed" : "pending"}">
-        <span class="cond-icon">${done ? "✓" : opts.step || "◷"}</span>
+        <span class="cond-icon">${done ? "✓" : "🕒"}</span>
         <div class="cond-text">
           <strong>${opts.title}${opts.info ? `<button type="button" class="cond-info" data-tip="${opts.info}" aria-label="${opts.info}">i</button>` : ""}</strong>
           <div class="cond-bar-wrap" data-tip="${done ? "Tamamlandı" : opts.leftLabel(left)}">
@@ -1192,51 +1192,51 @@ function tierConditionsHTML(tier) {
   const moneyLeft = (n) => `${tl(n)} daha harcaman gerekiyor`;
 
   if (tier === "Base") {
-    return plainRow(g.martAccountOpen ? "completed" : "pending", g.martAccountOpen ? "✓" : "1",
+    return plainRow(g.martAccountOpen ? "completed" : "pending", g.martAccountOpen ? "✓" : "🕒",
           "Orbit Mart'ta hesap aç",
           g.martAccountOpen ? "Tamamlandı" : "Base için zorunlu")
       + barRow({
           title: "Son 3 ayda en az 2.500 TL harcama yap",
           info: "Orbit Eats ve Orbit Mart içerisinde yaptığın toplam harcama tutarı",
           now: spend.totalAnyMethod, target: BASE_ACTIVITY_THRESHOLD,
-          fmt: money, leftLabel: (n) => `${tl(n)} daha harcaman gerekiyor`, step: "2"
+          fmt: money, leftLabel: (n) => `${tl(n)} daha harcaman gerekiyor`
         });
   }
 
   if (tier === "Plus") {
-    return plainRow(g.kycVerified ? "completed" : "pending", g.kycVerified ? "✓" : "🔒",
+    return plainRow(g.kycVerified ? "completed" : "pending", g.kycVerified ? "✓" : "🕒",
         "Orbit Pay'de hesap aç ve kimliğini doğrula",
         g.kycVerified ? "Tamamlandı" : "Plus için zorunlu")
       + barRow({
           title: `Son 3 ayda Orbit Mart'tan en az ${PLUS_MART_ORDER_TARGET} market siparişi oluştur`,
           now: g.martOrders90d || 0, target: PLUS_MART_ORDER_TARGET,
           fmt: (n) => `${n} sipariş`,
-          leftLabel: (n) => `${n} sipariş daha vermen gerekiyor`, step: "2"
+          leftLabel: (n) => `${n} sipariş daha vermen gerekiyor`
         })
       + barRow({
           title: `Son 3 ayda toplam ${TIER_THRESHOLDS.Plus.minSpend90d.toLocaleString("tr-TR")} TL harcama yap`,
           info: "Orbit Eats ve Orbit Mart içerisinde yaptığın toplam harcama tutarı",
           now: spend.totalAnyMethod, target: TIER_THRESHOLDS.Plus.minSpend90d,
-          fmt: money, leftLabel: moneyLeft, step: "3"
+          fmt: money, leftLabel: moneyLeft
         });
   }
 
   const tenureDays = getTenureDays(STATE.user);
   const standing = (g.standingOrders || 0) >= TIER_THRESHOLDS.Prime.minStandingOrders;
-  return plainRow(standing ? "completed" : "pending", standing ? "✓" : "1",
+  return plainRow(standing ? "completed" : "pending", standing ? "✓" : "🕒",
       "Orbit Pay'den cüzdanına otomatik yükleme talimatı ver",
       standing ? "Tamamlandı" : "Sipariş tutarı cüzdan bakiyenden yüksek olduğunda eksik tutar kayıtlı kartından tamamlanır.")
     + barRow({
         title: `Son 3 ayda toplam ${TIER_THRESHOLDS.Prime.minSpend90d.toLocaleString("tr-TR")} TL harcama yap`,
         info: "Orbit Eats ve Orbit Mart içerisinde yaptığın toplam harcama tutarı",
         now: spend.totalAnyMethod, target: TIER_THRESHOLDS.Prime.minSpend90d,
-        fmt: money, leftLabel: moneyLeft, step: "2"
+        fmt: money, leftLabel: moneyLeft
       })
     + barRow({
         title: "Orbit Eats'te 1 yılı tamamla",
         now: tenureDays, target: TIER_THRESHOLDS.Prime.minTenureDays,
         fmt: (n) => `${Math.floor(n / 30)} ay`,
-        leftLabel: (n) => `${Math.ceil(n / 30)} ay daha üyelik gerekiyor`, step: "3"
+        leftLabel: (n) => `${Math.ceil(n / 30)} ay daha üyelik gerekiyor`
       });
 }
 

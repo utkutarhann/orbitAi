@@ -3297,9 +3297,10 @@ body {
 .tier-condition-item.pending .cond-icon {
   background: #fee2e2;
   color: #dc2626;
+  font-size: 14px;
 }
 .tier-condition-item.pending .cond-text strong {
-  color: #dc2626;
+  color: var(--orbit-ink);
 }
 .cond-sub {
   font-size: 11px;
