@@ -646,7 +646,7 @@ function getLoyaltyBanner(user) {
     return {
       type: "prime",
       tag: "Prime Statü 🎉",
-      message: `Tebrikler ${user.name}! Orbit Grow'da Prime'sın — Orbit Pay ile ödediğin siparişlerde her zaman ücretsiz teslimat ve öncelikli kurye senin.`,
+      message: `Tebrikler ${user.name}! Orbit Grow'da Prime'sın — Orbit Eats ve Orbit Mart'taki tüm siparişlerinde her zaman ücretsiz teslimat ve öncelikli kurye senin.`,
       cta: "Prime avantajlarını gör"
     };
   }
