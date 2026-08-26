@@ -1668,8 +1668,9 @@ function openRestaurant(restaurantId, highlightItemId) {
       </div>
       <div class="section-title"><span>Menü</span></div>
       ${r.menu.map(m => menuRowHTML(m, m.id === highlightItemId)).join("")}
-      <button class="btn-primary" id="goCart" style="${cartCount() ? "" : "display:none"}">
-        Sepete Git (${cartCount()} ürün · ${cartTotal()} TL)
+      <button class="btn-primary go-cart-bar" id="goCart" style="${cartCount() ? "" : "display:none"}">
+        <span>Sepete Git (${cartCount()} ürün)</span>
+        <strong>Toplam Tutar: ${cartTotal()} TL ›</strong>
       </button>
     </div>
   `;
@@ -1685,8 +1686,8 @@ function menuRowHTML(m, highlight) {
   return `
     <div class="menu-item-row" style="${highlight ? "border:2px solid var(--orbit-ai)" : ""}">
       <div class="menu-item-info">
-        <p class="menu-item-name">${m.name}</p>
-        <p class="menu-item-tags">${m.price} TL · ${m.calories} kcal</p>
+        <p class="menu-item-name">${m.name} <span class="menu-item-price-inline">${m.price} TL</span></p>
+        <p class="menu-item-tags">${m.calories} kcal</p>
         ${dietFilterOn() && m.allergens && m.allergens.length ? (() => {
           // Kullanıcının kaçındığı alerjen ayrıca vurgulanır; karar her zaman kullanıcıda
           // Süzme kapalıyken kişisel uyarı yapılmaz, yalnızca içerik bilgisi verilir
