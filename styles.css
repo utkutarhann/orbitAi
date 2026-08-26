@@ -2624,7 +2624,6 @@ body {
   z-index: 50;
   display: flex;
   align-items: flex-end;
-  padding-top: 52px;
   /* fadeIn translateY içerdiği için overlay'i 10px aşağı kaydırıyordu — sadece opacity */
   animation: overlayFade 0.2s ease;
 }
@@ -2634,7 +2633,7 @@ body {
 }
 .tier-modal-content {
   width: 100%;
-  max-height: calc(100% - 52px) !important;
+  max-height: 100%;
   background: #ffffff;
   color: var(--orbit-ink);
   border-radius: 28px 28px 0 0;
