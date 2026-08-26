@@ -833,7 +833,7 @@ function scoreItem(item, signals, query) {
   }
 
   score += ((item.rating || 4) - 4) * 1.5;
-  return { score, reasons, hasAvoidedAllergen };
+  return { score, reasons, hasAvoidedAllergen, kwScore: kw.score };
 }
 
 /* Süzme açıkken profil beslenme tarzına uymayan kalemler yerel motorda da
@@ -853,12 +853,14 @@ function aiSearch(query) {
   if (!query || !query.trim()) return [];
   const catalog = buildMenuCatalog().filter(passesProfileDiet);
   const signals = parseQuerySignals(query);
+  const isSignalSearch = !!(signals.diet || signals.maxBudget || signals.spice || signals.weight);
 
   const scored = catalog
     .map((item) => {
-      const { score, reasons, hasAvoidedAllergen } = scoreItem(item, signals, query);
-      return { item, score, reasons, hasAvoidedAllergen };
+      const { score, reasons, hasAvoidedAllergen, kwScore } = scoreItem(item, signals, query);
+      return { item, score, reasons, hasAvoidedAllergen, kwScore };
     })
+    .filter(x => x.kwScore > 0 || (isSignalSearch && x.score > 0))
     .sort((a, b) => b.score - a.score)
     .slice(0, 4);
 

@@ -1403,6 +1403,34 @@ body {
 
 .empty-state { text-align: center; padding: 60px 20px; color: var(--orbit-muted); font-size: 13px; }
 
+.empty-search-state {
+  text-align: center;
+  padding: 40px 22px;
+  background: var(--orbit-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  margin: 18px 0;
+  border: 1px solid var(--orbit-border);
+}
+.ess-icon {
+  font-size: 46px;
+  margin-bottom: 12px;
+}
+.ess-title {
+  font-size: 15.5px;
+  font-weight: 800;
+  color: var(--orbit-ink);
+  margin: 0 0 8px;
+  line-height: 1.35;
+}
+.ess-sub {
+  font-size: 12.5px;
+  color: var(--orbit-muted);
+  line-height: 1.55;
+  margin: 0 0 20px;
+  font-weight: 500;
+}
+
 .issue-card {
   background: var(--orbit-amber-soft); border: 1.5px solid #ffd4a8; border-radius: var(--radius-lg);
   padding: 18px; margin-top: 16px;

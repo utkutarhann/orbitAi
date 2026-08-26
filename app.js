@@ -1610,11 +1610,18 @@ function renderSearchResults(results, query) {
       <div class="screen-header">
         <button class="back-btn" id="back">‹</button>
         <div>
-          <p class="screen-title">Senin için seçtim</p>
+          <p class="screen-title">${results.length === 0 ? "Arama Sonuçları" : "Senin için seçtim"}</p>
           <p class="screen-subtitle">"${query}"</p>
         </div>
       </div>
-      ${results.length === 0 ? `<div class="empty-state">Uygun bir sonuç bulamadım, farklı bir şey dener misin?</div>` : ""}
+      ${results.length === 0 ? `
+        <div class="empty-search-state">
+          <div class="ess-icon">🔍</div>
+          <p class="ess-title">Arama kriterlerinize uygun bir sonuç bulunamadı</p>
+          <p class="ess-sub">Orbit Eats şu an yalnızca restoran ve yemek siparişleri için hizmet vermektedir. Lütfen restoran, mutfak veya yemek adı (örn: Burger, Kebap, Pizza, Mantı) girerek tekrar deneyiniz.</p>
+          <button class="btn-primary" id="essBack">Keşfetmeye devam et</button>
+        </div>
+      ` : ""}
       ${groups.map(g => `
         <div class="restaurant-group">
           <div class="restaurant-group-header">
@@ -1646,6 +1653,8 @@ function renderSearchResults(results, query) {
     </div>
   `;
   document.getElementById("back").addEventListener("click", renderHome);
+  const essBack = document.getElementById("essBack");
+  if (essBack) essBack.addEventListener("click", renderHome);
   document.querySelectorAll("[data-restaurant]").forEach(el => {
     el.addEventListener("click", () => openRestaurant(el.dataset.restaurant, el.dataset.item));
   });
