@@ -711,8 +711,10 @@ function getDeliveryFee(orderTotal, vertical, selectedMethod, tier) {
   const v = vertical === "mart" ? "mart" : "eats";
   const total = orderTotal || 0;
 
-  if (tier === "Prime" && withPay) {
-    return { fee: 0, free: true, reason: "Prime · Orbit Pay ile her zaman ücretsiz" };
+  /* Prime'da teslimat ödeme yönteminden bağımsız ücretsiz — kartla ödense bile.
+     Plus'ta ise ücretsiz teslimat Orbit Pay şartına bağlı kalıyor. */
+  if (tier === "Prime") {
+    return { fee: 0, free: true, reason: "Prime · her zaman ücretsiz" };
   }
   if (tier === "Plus" && withPay && v === "eats" && total >= PLUS_FREE_DELIVERY_MIN) {
     return { fee: 0, free: true, reason: `Plus · ${PLUS_FREE_DELIVERY_MIN} TL üzeri Orbit Pay ödemesi` };
@@ -724,7 +726,7 @@ function getDeliveryFee(orderTotal, vertical, selectedMethod, tier) {
       hint: `${left.toLocaleString("tr-TR")} TL daha ekle, teslimat ücretsiz olsun`
     };
   }
-  if ((tier === "Plus" || tier === "Prime") && !withPay) {
+  if (tier === "Plus" && !withPay) {
     return {
       fee: STANDARD_DELIVERY_FEE, free: false,
       hint: "Orbit Pay ile ödersen teslimat avantajın geçerli olur"

@@ -2624,6 +2624,7 @@ body {
   z-index: 50;
   display: flex;
   align-items: flex-end;
+  padding-top: 14px;
   /* fadeIn translateY içerdiği için overlay'i 10px aşağı kaydırıyordu — sadece opacity */
   animation: overlayFade 0.2s ease;
 }
@@ -4106,11 +4107,11 @@ body {
   /* tier-modal-content padding'ini (10px 18px) iptal edip kenarlara yasla */
   margin: 0 -18px 16px -18px;
   border-radius: 28px 28px 22px 22px;
-  padding: 26px 18px 20px;
+  padding: 32px 18px 20px;
 }
 .modal-close-btn.on-card {
   position: absolute;
-  top: 14px;
+  top: 18px;
   left: 14px;
   right: auto;
   background: rgba(255, 255, 255, 0.16);
