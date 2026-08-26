@@ -1605,33 +1605,16 @@ function renderSearchResults(results, query) {
     g.items.push(r);
   });
 
-  const mh = typeof getMartHandoff === "function" ? getMartHandoff(query) : null;
-
   root.innerHTML = `
     <div class="screen">
       <div class="screen-header">
         <button class="back-btn" id="back">‹</button>
         <div>
-          <p class="screen-title">${results.length === 0 && !mh ? "Arama Sonuçları" : "Senin için seçtim"}</p>
+          <p class="screen-title">${results.length === 0 ? "Arama Sonuçları" : "Senin için seçtim"}</p>
           <p class="screen-subtitle">"${query}"</p>
         </div>
       </div>
-      ${mh ? `
-        <div class="mart-bridge" style="margin-bottom:18px">
-          <div class="mb-head">
-            <span class="mb-tag">🛒 Orbit Mart Akıllı Öneri</span>
-            <span class="mb-perk">${mh.perkLine}</span>
-          </div>
-          <p class="mb-text">
-            ${mh.dish} evde de yapılabilir — taze tarif malzemelerini Orbit Mart'tan <strong>15 dk</strong> içinde getirebilirim.
-          </p>
-          <div class="mb-items">
-            ${mh.items.map(i => `<span class="mb-item">${i}</span>`).join("")}
-          </div>
-          <button class="mb-btn" id="searchMartBtn">Malzemeleri Orbit Mart'ta hazırla</button>
-        </div>
-      ` : ""}
-      ${results.length === 0 && !mh ? `
+      ${results.length === 0 ? `
         <div class="empty-search-state">
           <div class="ess-icon">🔍</div>
           <p class="ess-title">Arama kriterlerinize uygun bir sonuç bulunamadı</p>
@@ -1672,8 +1655,6 @@ function renderSearchResults(results, query) {
   document.getElementById("back").addEventListener("click", renderHome);
   const essBack = document.getElementById("essBack");
   if (essBack) essBack.addEventListener("click", renderHome);
-  const smb = document.getElementById("searchMartBtn");
-  if (smb) smb.addEventListener("click", () => showToast("🛒 Orbit Mart sepetinize 4 kalem malzeme eklendi (15 dk teslimat)."));
   document.querySelectorAll("[data-restaurant]").forEach(el => {
     el.addEventListener("click", () => openRestaurant(el.dataset.restaurant, el.dataset.item));
   });
