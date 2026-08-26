@@ -2873,11 +2873,10 @@ async function processIssuePhoto(file) {
           { label: "Otomatik iade", detail: "Doğrulanmamış kanıtla otomatik iade yapılmaz", ok: false }
         ];
       } else if (karar.reason === "item_unclear") {
-        textMsg = `Fotoğrafı inceledim ancak sorunlu ürünü fotoğraftan net olarak ayırt edemedim. Orbit AI yalnızca kesin olduğunda otomatik iade kararı verir, belirsizlik durumunda karar insana aktarılır. Dosyanı destek ekibimize aktarıyorum.`;
+        textMsg = `Fotoğrafı inceledim ancak eksik veya sorunlu olan ürünü fotoğraftan net olarak ayırt edemedim. Sana doğru şekilde yardımcı olabilmem ve tespiti yapabilmem için teslim edilen tüm yemekleri aynı karede görebileceğim yeni bir görsel iletebilir misin?`;
         checks = [
-          { label: "Görüntü doğrulandı", detail: (vision && vision.description) || "Görsel incelendi", ok: true },
-          { label: "Ürün eşleşmesi", detail: "Fotoğraftaki ürün net ayırt edilemedi", ok: false },
-          { label: "Otomatik iade kararı", detail: "Belirsizlik durumunda otomatik para iadesi yapılmaz", ok: false }
+          { label: "Görüntü incelendi", detail: (vision && vision.description) || "Görsel analizi yapıldı", ok: true },
+          { label: "Ürün tespiti", detail: "Sorunlu ürün net olarak ayırt edilemedi", ok: false }
         ];
       } else {
         textMsg = `Fotoğrafı inceledim, anlattığınla örtüşüyor. Ancak sipariş tutarı ${tl(orderTotal)} (≥ 1.000 TL) olduğu için bu talebi otomatik sonuçlandırma yetkim yok — dosyanı tüm kanıtlarla birlikte destek ekibimize aktarıyorum. Ekibimiz kısa süre içinde seninle iletişime geçecek.`;
@@ -2892,9 +2891,11 @@ async function processIssuePhoto(file) {
         role: "assistant",
         text: textMsg,
         checks,
-        escalated: true
+        escalated: karar.reason !== "item_unclear"
       });
-      setIssueQuickChips(["Temsilciye bağlan", "Siparişi tekrarla"]);
+      setIssueQuickChips(karar.reason === "item_unclear"
+        ? ["Yeni fotoğraf ekleyeyim", "Temsilciye bağlan"]
+        : ["Temsilciye bağlan", "Siparişi tekrarla"]);
 
     } else {
       const ai = await callGeminiSupport("", supportContext({
