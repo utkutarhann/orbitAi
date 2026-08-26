@@ -391,6 +391,17 @@ GÖREVİN:
    yoksa liste çıkarmak yerine kısa bir karşılık verip konuyu yemeğe getiriyoruz. */
 const FOOD_HINTS = /musakka|döner|doner|köfte|kofte|sarma|lokanta|yemek|yiyecek|iç(ecek|mek)|aç|açlık|kahvaltı|öğle|akşam|atıştır|tatlı|çorba|salata|pizza|burger|kebap|dürüm|sushi|makarna|pilav|börek|mantı|tavuk|et |balık|vegan|vejetaryen|diyet|kalori|bütçe|tl |sipariş|menü|restoran|mutfak|lezzet|doyur|hafif|acı|sıcak bir şey|canım.*çek/i;
 
+function reflectIntent(text, signals) {
+  const t = (text || "").toLowerCase();
+  if (/çorba|corba|sıcak|sicak/.test(t)) return "Canın sıcak ve içini ısıtacak bir şey çekiyor.";
+  if (/tatlı|tatli|dessert/.test(t)) return "Tatlı bir mola arıyorsun.";
+  if (/hafif|light/.test(t)) return "Hafif ve ağır olmayan bir akşam yemeği istiyorsun.";
+  if (/vegan|vejetaryen/.test(t)) return "Et içermeyen seçenekler arıyorsun.";
+  if (/doyurucu|aç|ac /.test(t)) return "İyice doyurucu bir şey arıyorsun.";
+  if (signals && signals.maxBudget) return `Bütçeni ${signals.maxBudget} TL civarında tutmak istiyorsun.`;
+  return `"${text}" için en uygun seçenekleri arıyorum.`;
+}
+
 function looksLikeFoodRequest(query) {
   const q = (query || "").trim();
   if (!q) return false;
@@ -708,7 +719,8 @@ function canUseUnconditionalRefund(user) {
    ekler. Avantaj metni CASHBACK_RATES'ten türetilir, modele yazdırılmaz. */
 function normalizeMartHandoff(raw) {
   if (!raw || !raw.dish || !Array.isArray(raw.martItems) || raw.martItems.length < 2) return null;
-  const tier = computeTier(STATE.user);
+  const userObj = (typeof STATE !== "undefined" && STATE && STATE.user) ? STATE.user : (typeof USER !== "undefined" ? USER : null);
+  const tier = computeTier(userObj);
   const rate = Math.round((CASHBACK_RATES[tier].mart || 0) * 100);
   return {
     dish: String(raw.dish).trim(),
@@ -881,7 +893,8 @@ function scoreItem(item, signals, query) {
    elenir; kapalıyken menünün tamamı değerlendirmeye girer. Alerjen filtresi
    scoreItem içinde her koşulda uygulanır. */
 function passesProfileDiet(item) {
-  const p = (STATE.user && STATE.user.declaredPreferences) || {};
+  const u = (typeof STATE !== "undefined" && STATE && STATE.user) ? STATE.user : (typeof USER !== "undefined" ? USER : null);
+  const p = (u && u.declaredPreferences) || {};
   if (p.dietFilterActive === false || !p.dietStyle) return true;
   const tags = (item.tags || []).join(" ");
   if (p.dietStyle === "vegan") return /vegan/.test(tags);
@@ -1324,7 +1337,7 @@ async function photoSearchWithGemini(base64, mimeType) {
   if (!currentKey || !base64) return null;
   if (Date.now() < QUOTA_STATE.cooldownUntil) return null;
 
-  const user = STATE.user || {};
+  const user = (typeof STATE !== "undefined" && STATE && STATE.user) ? STATE.user : (typeof USER !== "undefined" ? USER : {});
   const prefs = user.declaredPreferences || {};
   const catalog = shortlistForLlm("", buildMenuCatalog(), 16);
   const menuListesi = catalog.map(i =>
@@ -1433,7 +1446,7 @@ fotoğrafta ne gördüğünü tekrar etme — sadece neden bu seçenekleri seçt
 /* Tüm AI konuşmaları bu sinyaller üzerine kuruluyor: kullanıcının hangi saatte
    ne sipariş ettiği, hangi fiyat aralığında gezdiği ve neyi tekrarladığı. */
 function orderHistoryInsights(user) {
-  const u = user || STATE.user || {};
+  const u = user || (typeof STATE !== "undefined" && STATE && STATE.user) || (typeof USER !== "undefined" ? USER : {});
   const hist = u.orderHistory || [];
   if (!hist.length) return null;
 
