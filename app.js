@@ -2598,6 +2598,52 @@ function renderIssueChatMessages() {
       </div>`;
     }
     let html = `<div class="chat-bubble assistant">${m.text}</div>`;
+    if (m.orderCard) {
+      const o = (typeof activeOrder === "function" ? activeOrder() : null) || {
+        storeName: "Focus Burger & Gurme Mutfak",
+        itemsSummary: "1x Trüf Cheddarlı Burger Menu, 1x San Sebastian Cheesecake",
+        totalTRY: 460,
+        deliveryAddress: "Levent Mah. Konut Sok. No:4 D:8"
+      };
+      const d = (typeof initDelivery === "function" ? initDelivery() : { delayMin: 10 });
+      const rem = (typeof remainingMin === "function" ? remainingMin() : 12);
+      const clock = (typeof deliveryClock === "function" ? deliveryClock() : "21:45");
+
+      html += `
+        <div class="chat-live-order-card">
+          <div class="cloc-header">
+            <div class="cloc-title">
+              <span class="cloc-icon">🛵</span>
+              <div>
+                <strong>${o.storeName || "Focus Burger & Gurme Mutfak"}</strong>
+                <p class="cloc-status-pill">Siparişin Yolda · Tahmini ${rem} dk (${clock})</p>
+              </div>
+            </div>
+          </div>
+          <div class="cloc-details">
+            <div class="cloc-detail-row">
+              <span class="cloc-label">📦 Sipariş İçeriği</span>
+              <span class="cloc-val">${o.itemsSummary || "1x Trüf Cheddarlı Burger Menu, 1x San Sebastian Cheesecake"}</span>
+            </div>
+            <div class="cloc-detail-row">
+              <span class="cloc-label">📍 Teslimat Adresi</span>
+              <span class="cloc-val">${o.deliveryAddress || "Levent Mah. Konut Sok. No:4 D:8"}</span>
+            </div>
+            <div class="cloc-detail-row">
+              <span class="cloc-label">💳 Toplam Tutar</span>
+              <span class="cloc-val"><strong>${o.totalPrice || `${o.totalTRY || 460} TL`}</strong></span>
+            </div>
+            <div class="cloc-detail-row">
+              <span class="cloc-label">🚦 Yol & Trafik Durumu</span>
+              <span class="cloc-val ${d.delayMin > 0 ? "text-warn" : "text-ok"}">
+                ${d.delayMin > 0 ? `Yoğunluk nedeniyle +${d.delayMin} dk gecikme` : "Normal seyrediyor"}
+              </span>
+            </div>
+          </div>
+          <button class="cloc-btn" data-action="track" data-id="${o.id || "active"}">🚀 Canlı Sipariş Haritası & Detayı</button>
+        </div>
+      `;
+    }
 
     if (m.checks && m.checks.length) {
       html += `<div class="cv-checks">
@@ -2634,6 +2680,9 @@ function renderIssueChatMessages() {
   }).join("");
   body.scrollTop = body.scrollHeight;
 
+  body.querySelectorAll(".cloc-btn").forEach(btn => {
+    btn.addEventListener("click", () => renderTracking());
+  });
   const approveBtn = body.querySelector("[data-approve]");
   if (approveBtn) approveBtn.addEventListener("click", approveIssueRefund);
   const humanBtn = body.querySelector("[data-human]");
@@ -2804,6 +2853,11 @@ async function handleIssueChatMessage(text) {
   const typingMsg = { role: "typing" };
   STATE.issueChat.messages.push(typingMsg);
   renderIssueChatMessages();
+
+  // Canlı sipariş ve destek sorularında 2.6sn düşünme adımları ve net kibar AI cevabı çalıştırılır:
+  if (handleIssueOrderSupportFlow(text, typingMsg)) {
+    return;
+  }
 
   // Kullanıcı iade onay sorusuna olumlu yanıt verdiyse:
   if (STATE.issueChat.pendingRefund && /onay|evet|kabul|tamam|istiyorum/i.test(text)) {
