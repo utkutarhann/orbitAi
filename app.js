@@ -2742,6 +2742,34 @@ async function handleIssueChatMessage(text) {
   STATE.issueChat.messages.push(typingMsg);
   renderIssueChatMessages();
 
+  // Kullanıcı iade onay sorusuna olumlu yanıt verdiyse:
+  if (STATE.issueChat.pendingRefund && /onay|evet|kabul|tamam|istiyorum/i.test(text)) {
+    const pr = STATE.issueChat.pendingRefund;
+    STATE.issueChat.pendingRefund = null;
+    const i = STATE.issueChat.messages.indexOf(typingMsg);
+    if (i > -1) STATE.issueChat.messages.splice(i, 1);
+
+    if (STATE.user && STATE.user.orbitPay) {
+      STATE.user.orbitPay.balanceTRY = (STATE.user.orbitPay.balanceTRY || 0) + pr.amount;
+    }
+
+    STATE.issueChat.messages.push({
+      role: "assistant",
+      text: `Harika, onayını aldım! ${pr.amount} TL iaden Orbit Pay cüzdanına başarıyla tanımlandı.`,
+      checks: [
+        { label: "Müşteri onayı", detail: "Kullanıcı iade çözümünü onayladı", ok: true },
+        { label: "Cüzdan aktarımı", detail: `${pr.amount} TL bakiyene eklendi`, ok: true }
+      ],
+      resolution: {
+        refundAmount: pr.amount,
+        settled: true
+      }
+    });
+    setIssueQuickChips(["Siparişi tekrarla", "Ana sayfaya dön"]);
+    renderIssueChatMessages();
+    return;
+  }
+
   const tip = classifyIssue(text);
   STATE.issueChat.issueType = tip;
 
@@ -2931,34 +2959,31 @@ async function evaluatePhotoEvidenceWithIssue(shrunk, issueType) {
         : ["Temsilciye bağlan", "Siparişi tekrarla"]);
 
     } else {
-      const ai = await callGeminiSupport("", supportContext({
-        mode: "resolution",
-        issueType,
-        refundAmount: karar.refundAmount,
-        itemName: karar.itemName,
-        basis: karar.basis
-      }));
+      const storeName = (order && order.storeName) || "Focus Burger & Gurme Mutfak";
+      const itemName = karar.itemName || "San Sebastian Cheesecake";
+      const amount = karar.refundAmount || 120;
+
+      STATE.issueChat.pendingRefund = {
+        amount,
+        itemName,
+        storeName,
+        basis: karar.basis,
+        vision
+      };
+
+      const customText = `${storeName} siparişin özelinde tatlı siparişinin (${itemName}) iletilmediğini görüyorum. Eksik ürün için çok özür dilerim. ${tl(amount)} iadeni hesabına tanımlamamı onaylıyor musun? Eğer bu çözüm senin için uygun değilse canlı destek ekibimizle farklı alternatifleri de konuşabilirsin.`;
+
       STATE.issueChat.messages.push({
         role: "assistant",
-        text: ai.reply || karar.explanation,
+        text: customText,
         checks: [
-          { label: "Görüntü doğrulandı", detail: (vision && vision.description) || "2 dk önce çekilmiş · konum siparişle eşleşiyor", ok: true },
-          { label: "Sipariş eşleşmesi", detail: (vision && vision.observation) || `"${issueType}" ile tutarlı`, ok: true },
+          { label: "Görüntü doğrulandı", detail: (vision && vision.description) || "Görselde burger, patates ve kola var", ok: true },
+          { label: "Sipariş eşleşmesi", detail: `${itemName} fotoğrafta yer almıyor`, ok: true },
           { label: "Geçmiş talep örüntüsü", detail: "Son 90 günde benzer talep yok", ok: true },
-          { label: "İade dayanağı",
-            detail: karar.basis === "delivery_fee"
-              ? `Teslimat ücreti · ${tl(karar.refundAmount)}`
-              : karar.itemName
-                ? `${karar.itemName} · ${tl(karar.refundAmount)}`
-                : `Eksik ürün karşılığı · ${tl(karar.refundAmount)}`,
-            ok: true }
-        ],
-        resolution: {
-          refundAmount: karar.refundAmount,
-          settled: false
-        }
+          { label: "İade teklifi", detail: `${itemName} karşılığı ${tl(amount)}`, ok: true }
+        ]
       });
-      setIssueQuickChips(["Temsilciye bağlan", "Siparişi tekrarla"]);
+      setIssueQuickChips(["İadeyi Onaylıyorum", "Canlı Destek"]);
     }
     renderIssueChatMessages();
   }, 260 + lines.length * 460 + 260);
