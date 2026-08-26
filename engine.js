@@ -985,7 +985,7 @@ Hesaplamanın detayına girme; yüzde, oran veya üst sınır gibi ifadeler kull
 Son cümlede: bu çözüm ona uygun değilse canlı destek ekibiyle farklı
 alternatifleri konuşabileceğini belirt.`
   : `DURUM: Müşteri sorununu yeni anlattı. Henüz fotoğraf yok.
-Eğer müşteri "eksik ürün" veya siparişinde eksik bir şey olduğunu bildirdiyse tam olarak şu cümleyi söyle: "Teslim edilen siparişteki tüm ürünleri aynı karede görebileceğim şekilde benimle paylaşır mısın?"
+Eğer müşteri "eksik ürün" veya siparişinde eksik bir şey olduğunu bildirdiyse tam olarak şu cümleyi söyle: "Yaşadığın bu olumsuz deneyim için üzgünüm. Teslim edilen siparişteki tüm ürünleri aynı karede görebileceğim şekilde benimle paylaşır mısın?"
 Diğer sorun durumlarında onu sakinleştir, sorunu anladığını göster ve değerlendirmeyi hızlandırmak için fotoğraf paylaşmasını nazikçe iste.`}
 
 Yalnızca şu JSON'u döndür:
@@ -1105,7 +1105,7 @@ function localSupportReply(userText, ctx) {
     return {
       isRealAi: false,
       issueType: tip,
-      reply: "Teslim edilen siparişteki tüm ürünleri aynı karede görebileceğim şekilde benimle paylaşır mısın?",
+      reply: "Yaşadığın bu olumsuz deneyim için üzgünüm. Teslim edilen siparişteki tüm ürünleri aynı karede görebileceğim şekilde benimle paylaşır mısın?",
       needsPhoto: true,
       followups: ["Fotoğraf ekleyeyim", "Destek ekibine aktar"]
     };
