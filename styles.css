@@ -793,20 +793,16 @@ body {
 .menu-item-name {
   font-size: 14px;
   font-weight: 700;
+  color: var(--orbit-ink);
   margin: 0 0 4px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  line-height: 1.35;
+  padding-right: 8px;
 }
-.menu-item-price-inline {
+.menu-item-price-text {
   font-size: 13.5px;
   font-weight: 800;
   color: var(--orbit-primary-dark);
-  background: rgba(108, 43, 217, 0.09);
-  padding: 2px 7px;
-  border-radius: 6px;
-  margin-left: 2px;
+  white-space: nowrap;
 }
 .menu-item-tags { font-size: 10.5px; color: var(--orbit-muted); font-weight: 500; }
 .go-cart-bar {

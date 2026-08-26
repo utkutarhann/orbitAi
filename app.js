@@ -1686,7 +1686,7 @@ function menuRowHTML(m, highlight) {
   return `
     <div class="menu-item-row" style="${highlight ? "border:2px solid var(--orbit-ai)" : ""}">
       <div class="menu-item-info">
-        <p class="menu-item-name">${m.name} <span class="menu-item-price-inline">${m.price} TL</span></p>
+        <p class="menu-item-name">${m.name} <span class="menu-item-price-text">· ${m.price} TL</span></p>
         <p class="menu-item-tags">${m.calories} kcal</p>
         ${dietFilterOn() && m.allergens && m.allergens.length ? (() => {
           // Kullanıcının kaçındığı alerjen ayrıca vurgulanır; karar her zaman kullanıcıda
