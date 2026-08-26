@@ -3577,44 +3577,109 @@ function buildResultGroups(results) {
 }
 
 /* ---------------- ASYNC GEMINI CHAT HANDLER ---------------- */
+function handleOrderSupportFlow(text, typingMsg) {
+  const t = (text || "").toLowerCase();
+  const rem = typeof remainingMin === "function" ? remainingMin() : 15;
+  const clock = typeof deliveryClock === "function" ? deliveryClock() : "21:40";
+
+  let steps = [];
+  let responseText = "";
+  let orderCard = false;
+  let followups = [];
+
+  // 1. Kuryeyi arayabilir misin?
+  if (/kurye.*ara|kurye.*iletişim|kurye.*telefon/i.test(t)) {
+    steps = [
+      "🛵 Kurye telsiz hattına ve GPS konumuna bağlanılıyor…",
+      "Kurye iletişim kanalı ve aktif durum kontrol ediliyor…"
+    ];
+    responseText = "Kuryen Mert K. ile telsiz/sistem hattı üzerinden iletişime geçildi! 🛵 Kuryemiz şu an trafikte seyir halinde ve siparişini en kısa sürede adresine ulaştırmak için ilerliyor. Dilersen uygulama üzerinden doğrudan telefon araması da gerçekleştirebilirsin.";
+    followups = ["Tahmini süre nedir?", "Sipariş nerede"];
+  }
+  // 2. İptal etmek istiyorum
+  else if (/iptal/i.test(t)) {
+    steps = [
+      "🧾 Canlı sipariş ve restoran mutfak durumu inceleniyor…",
+      "Kurye teslimat aşaması kontrol ediliyor…"
+    ];
+    responseText = "Siparişin hazırlanıp kuryeye teslim edildiği ve yolda olduğu için sistem üzerinden anlık otomatik iptal sağlanamıyor. Ancak restoran ve kurye ekibimize bilgi iletildi. Sipariş adresine ulaştığında kapıda teslim almayarak iade sürecini başlatabilirsin veya dilersen canlı destek ekibimize aktarabilirim.";
+    followups = ["Sipariş nerede", "Canlı desteğe aktar"];
+  }
+  // 3. Tahmini süre nedir?
+  else if (/tahmini.*süre|teslimat.*süre|kalan.*süre/i.test(t)) {
+    steps = [
+      "⏱️ Anlık güzergâh trafiği ve kurye hızı hesaplanıyor…",
+      "Tahmini varış süresi güncelleniyor…"
+    ];
+    responseText = `Siparişinin adresine ulaşması için tahmini kalan süre: ${rem} dakika (${clock}). Kuryemiz Mert K. şu an yaklaşık 1.8 km mesafede ve lokasyonuna doğru sorunsuz ilerliyor.`;
+    followups = ["Kuryeyi arayabilir misin?", "Sipariş nerede"];
+  }
+  // 4. Sipariş nerede?
+  else if (/sipariş.*nerede|siparis.*nerede|sipariş.*durum/i.test(t)) {
+    steps = [
+      "🗺️ Canlı kurye GPS haritası ve restoran sipariş durumu sorgulanıyor…",
+      "Sipariş detayları derleniyor…"
+    ];
+    responseText = "Siparişin yolda! En kısa sürede sana ulaştırılacaktır. Canlı sipariş detaylarını ve tahmini teslimat durumunu aşağıda senin için hazırladım:";
+    orderCard = true;
+    followups = ["Tahmini süre nedir?", "Kuryeyi arayabilir misin?"];
+  }
+  // 5. Müşteri hizmetlerine bağlan
+  else if (/müşteri (hizmetleri|temsilcisi)|temsilci|canlı destek|bağlan/i.test(t)) {
+    steps = [
+      "💬 Kullanıcı profil bilgileri ve aktif sipariş geçmişi hazırlanıyor…",
+      "Canlı destek hattına bağlanılıyor…"
+    ];
+    responseText = "Sana yardım etmek için buradayım, yaşadığın deneyimi anlatır mısın?";
+    followups = ["İptal etmek istiyorum", "Sipariş nerede"];
+  }
+
+  if (steps.length === 0) return false;
+
+  // Typing mesajını Düşünme Adımları (steps) kartına çeviriyoruz
+  const stepsMsg = { role: "steps", lines: steps, done: false };
+  const idx = STATE.chatMessages.indexOf(typingMsg);
+  if (idx > -1) {
+    STATE.chatMessages[idx] = stepsMsg;
+  } else {
+    STATE.chatMessages.push(stepsMsg);
+  }
+  renderChatMessages();
+
+  // 2.6 saniye sonra düşünme tamamlanır ve net, kibar AI yanıtı basılır
+  const timer = setTimeout(() => {
+    stepsMsg.done = true;
+    const sIdx = STATE.chatMessages.indexOf(stepsMsg);
+    if (sIdx > -1) STATE.chatMessages.splice(sIdx, 1);
+
+    STATE.chatMessages.push({
+      role: "assistant",
+      text: responseText,
+      orderCard: orderCard,
+      followups: followups
+    });
+
+    renderChatMessages();
+    setChatGenerating(false);
+  }, 2600);
+
+  chatTimers.push(timer);
+  return true;
+}
+
+/* ---------------- ASYNC GEMINI CHAT HANDLER ---------------- */
 async function handleChatMessage(text, opts) {
   clearChatTimers();
   // Otomatik başlatılan akışlarda kullanıcı balonu gösterilmez
   if (!opts || !opts.silent) STATE.chatMessages.push({ role: "user", text });
 
-  /* Düşünme adımları gösterilmiyor; bekleme sırasında yalnızca bir yazıyor
-     göstergesi durur, yanıt hazır olunca doğrudan çıktı mesajı basılır. */
   const typingMsg = { role: "typing" };
   STATE.chatMessages.push(typingMsg);
   setChatGenerating(true);
   renderChatMessages();
 
-  // 1. Müşteri hizmetleri / temsilci talebi (Görsel 1):
-  if (/müşteri (hizmetleri|temsilcisi)|temsilci|canlı destek|bağlan/i.test(text)) {
-    const i = STATE.chatMessages.indexOf(typingMsg);
-    if (i > -1) STATE.chatMessages.splice(i, 1);
-    STATE.chatMessages.push({
-      role: "assistant",
-      text: "Sana yardım etmek için buradayım, yaşadığın deneyimi anlatır mısın?",
-      followups: ["İptal etmek istiyorum", "Sipariş nerede"]
-    });
-    renderChatMessages();
-    setChatGenerating(false);
-    return;
-  }
-
-  // 2. Sipariş nerede / canlı durum talebi (Görsel 2):
-  if (/sipariş.*nerede|siparis.*nerede|sipariş.*durum|kurye.*nerede/i.test(text)) {
-    const i = STATE.chatMessages.indexOf(typingMsg);
-    if (i > -1) STATE.chatMessages.splice(i, 1);
-    STATE.chatMessages.push({
-      role: "assistant",
-      text: "Siparişin yolda! En kısa sürede sana ulaştırılacaktır. Canlı sipariş detaylarını ve tahmini teslimat durumunu aşağıda senin için hazırladım:",
-      orderCard: true,
-      followups: ["Tahmini süre nedir?", "Kuryeyi arayabilir misin?"]
-    });
-    renderChatMessages();
-    setChatGenerating(false);
+  // Canlı sipariş ve destek sorularında 2.6sn düşünme adımları ve net kibar AI cevabı çalıştırılır:
+  if (handleOrderSupportFlow(text, typingMsg)) {
     return;
   }
 
