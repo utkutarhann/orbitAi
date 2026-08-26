@@ -1224,7 +1224,7 @@ function tierConditionsHTML(tier) {
   const tenureDays = getTenureDays(STATE.user);
   const standing = (g.standingOrders || 0) >= TIER_THRESHOLDS.Prime.minStandingOrders;
   return plainRow(standing ? "completed" : "pending", standing ? "✓" : "1",
-      "Orbit Pay'den cüzdanına yükleme talimatı ver",
+      "Orbit Pay'den cüzdanına otomatik yükleme talimatı ver",
       standing ? "Tamamlandı" : "Sipariş tutarı cüzdan bakiyenden yüksek olduğunda eksik tutar kayıtlı kartından tamamlanır.")
     + barRow({
         title: `Son 3 ayda toplam ${TIER_THRESHOLDS.Prime.minSpend90d.toLocaleString("tr-TR")} TL harcama yap`,
