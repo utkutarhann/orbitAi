@@ -3193,7 +3193,7 @@ function getScenarioGreeting() {
     return `Kalpler Kırmızı-Beyaz, ${name}! 🇹🇷 Maç heyecanına yakışır taraftar menülerini senin için derleyelim.`;
   }
 
-  return `${greetingByHour()} ${name}. Dilediğin yemeği bulmana yardımcı olmak için buradayım — hadi başlayalım.`;
+  return `${greetingByHour()} ${name}. Dilediğin yemeği bulmana yardımcı olmak için buradayım. Canın ne çekiyorsa sana destek olabilirim`;
 }
 
 function renderAiChat(fresh) {
