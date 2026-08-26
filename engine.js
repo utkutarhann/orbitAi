@@ -221,7 +221,7 @@ intent "food" ise aşağıdaki görevleri yap.
 
 GÖREVİN:
 1. Kullanıcıyla gerçek bir yemek danışmanı gibi samimi, sıcak bir tonda konuş. ${isFollowupTurn ? "Mesajın başına SAKIN 'Günaydın Baki Bey!' ekleme, doğrudan empatik yanıt ver." : "Samimi bir selamlamayla başla."}
-2. "companionMessage" alanında kullanıcıya doğrudan hitap eden, tercihlerini ve günün zaman dilimini dikkate aldığını belirten 2 cümlelik bir açıklama yaz.
+2. "companionMessage" alanında kullanıcıya doğrudan hitap eden, tercihlerini ve günün zaman dilimini dikkate aldığını belirten 2 cümlelik bir açıklama yaz. (ÖNEMLİ KURAL: Kullanıcı "musakka" istediğinde SAKIN "menümüzde yok" ya da "doğrudan bulunmuyor" deme! Kataloğumuzda Turkish Restaurant menüsünde Fırında Patlıcanlı Musakka - m55 bulunmaktadır. "Canın nefis bir musakka çekmiş! Menüsünde lezzetli fırın musakka yer alan restoranları ve ev yemeği alternatiflerini aşağıda senin için derledim." şeklinde sıcak bir açıklama yap ve m55'i öner.)
 3. Kataloğumuzdan kullanıcının talebine en uygun 1 ila 4 yemeğin "itemId"lerini seç.
 4. İstenen yemek evde yapılabilecek türdense (musakka, çorba, makarna, salata)
    "martHandoff" alanını doldur; profesyonel hazırlık isteyenlerde (sushi, döner)
@@ -421,6 +421,25 @@ function fallbackLocalAi(query) {
       results: [],
       martHandoff: null,
       followups: getScenarioFollowups(ctx.segment)
+    };
+  }
+
+  if (/musakka/i.test(query)) {
+    const catalog = buildMenuCatalog();
+    const musakkaItem = catalog.find(x => x.itemId === "m55") || catalog.find(x => /musakka/i.test(x.itemName));
+    const extraItems = catalog.filter(x => x.tags && x.tags.includes("ev-yemegi") && x.itemId !== "m55").slice(0, 2);
+    const matched = musakkaItem ? [musakkaItem, ...extraItems] : aiSearch(query);
+    return {
+      isRealAi: false,
+      intent: "food",
+      thinkingSteps: [
+        "Menüsünde Fırında Patlıcanlı Musakka bulunan restoranlar sorgulanıyor.",
+        "Ev yemeği alternatifleri derleniyor…"
+      ],
+      companionMessage: "Canın nefis bir musakka çekmiş! Menüsünde lezzetli fırın musakka yer alan restoranları ve ev yemeği alternatiflerini aşağıda senin için derledim. Dilersen malzemelerini sipariş edip evde pratikçe hazırlaman için market kartını da alt kısma ekledim:",
+      results: matched,
+      martHandoff: getMartHandoff(query),
+      followups: ["Akşam yemeği için hafif bir şey 🍲", "Sıcak ev yemeği & çorba 🥣"]
     };
   }
 

@@ -1202,6 +1202,181 @@ const RESTAURANTS = [
         ]
       }
     ]
+  },
+  {
+    "id": "r25",
+    "name": "Migros Kahvaltı",
+    "cuisine": "Kahvaltı & Börek",
+    "image": "assets/migros_kahvalti.jpg",
+    "rating": 4.5,
+    "deliveryMinutes": 15,
+    "distanceKm": 1.1,
+    "priceLevel": 2,
+    "tags": ["kahvalti", "borek", "hizli"],
+    "menu": [
+      {
+        "id": "m49",
+        "name": "Burger Kahvaltı",
+        "image": "assets/migros_kahvalti.jpg",
+        "price": 249,
+        "ingredients": ["burger ekmeği", "yumurta", "cheddar peyniri", "patates"],
+        "allergens": ["gluten", "süt ürünleri", "yumurta"],
+        "calories": 540,
+        "prepMinutes": 8,
+        "tags": ["kahvalti", "burger", "doyurucu"]
+      },
+      {
+        "id": "m50",
+        "name": "Peynirli Su Böreği",
+        "image": "https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=500&auto=format&fit=crop&q=80",
+        "price": 185,
+        "ingredients": ["yufka", "beyaz peynir", "tereyağı"],
+        "allergens": ["gluten", "süt ürünleri"],
+        "calories": 480,
+        "prepMinutes": 6,
+        "tags": ["borek", "kahvalti", "vejetaryen"]
+      }
+    ]
+  },
+  {
+    "id": "r26",
+    "name": "Galata Kahvaltıcısı By Migros",
+    "cuisine": "Kahvaltı & Börek",
+    "image": "assets/galata_kahvalti.jpg",
+    "rating": 3.9,
+    "deliveryMinutes": 18,
+    "distanceKm": 1.5,
+    "priceLevel": 2,
+    "tags": ["kahvalti", "wrap", "hafif"],
+    "menu": [
+      {
+        "id": "m51",
+        "name": "Kahvaltı Wrap",
+        "image": "assets/galata_kahvalti.jpg",
+        "price": 305,
+        "ingredients": ["lavaş", "yumurta", "avokado", "peynir", "yeşillik"],
+        "allergens": ["gluten", "süt ürünleri", "yumurta"],
+        "calories": 450,
+        "prepMinutes": 8,
+        "tags": ["wrap", "kahvalti", "hafif"]
+      },
+      {
+        "id": "m52",
+        "name": "Avokadolu Poşe Yumurta",
+        "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=500&auto=format&fit=crop&q=80",
+        "price": 220,
+        "ingredients": ["ekmek", "poşe yumurta", "avokado"],
+        "allergens": ["gluten", "yumurta"],
+        "calories": 380,
+        "prepMinutes": 7,
+        "tags": ["kahvalti", "hafif", "vejetaryen"]
+      }
+    ]
+  },
+  {
+    "id": "r27",
+    "name": "Bereket Döner",
+    "cuisine": "Döner",
+    "image": "assets/bereket_doner.jpg",
+    "rating": 4.7,
+    "deliveryMinutes": 20,
+    "distanceKm": 1.8,
+    "priceLevel": 2,
+    "tags": ["doner", "et-doner", "tavuk-doner", "doyurucu"],
+    "menu": [
+      {
+        "id": "m53",
+        "name": "Et Döner Dürüm Menü",
+        "image": "assets/bereket_doner.jpg",
+        "price": 320,
+        "ingredients": ["yaprak döner", "lavaş", "patates", "içecek"],
+        "allergens": ["gluten"],
+        "calories": 650,
+        "prepMinutes": 10,
+        "tags": ["doner", "doyurucu", "acisiz"]
+      },
+      {
+        "id": "m54",
+        "name": "Tavuk Döner Tombik",
+        "image": "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=500&auto=format&fit=crop&q=80",
+        "price": 240,
+        "ingredients": ["tombik ekmek", "tavuk döner", "turşu", "patates"],
+        "allergens": ["gluten"],
+        "calories": 520,
+        "prepMinutes": 8,
+        "tags": ["doner", "hizli"]
+      }
+    ]
+  },
+  {
+    "id": "r28",
+    "name": "Turkish Restaurant",
+    "cuisine": "Ev Yemekleri & Döner",
+    "image": "assets/turkish_restaurant.jpg",
+    "rating": 4.1,
+    "deliveryMinutes": 25,
+    "distanceKm": 2.2,
+    "priceLevel": 2,
+    "tags": ["ev-yemegi", "musakka", "corba", "doner"],
+    "menu": [
+      {
+        "id": "m55",
+        "name": "Fırında Patlıcanlı Musakka",
+        "image": "assets/turkish_restaurant.jpg",
+        "price": 290,
+        "ingredients": ["patlıcan", "kıyma", "domates", "biber", "sarımsak"],
+        "allergens": [],
+        "calories": 490,
+        "prepMinutes": 10,
+        "tags": ["ev-yemegi", "musakka", "doyurucu", "acisiz"]
+      },
+      {
+        "id": "m56",
+        "name": "Süzme Mercimek Çorbası & Döner",
+        "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=500&auto=format&fit=crop&q=80",
+        "price": 310,
+        "ingredients": ["mercimek çorbası", "et döner", "pilav"],
+        "allergens": ["gluten"],
+        "calories": 580,
+        "prepMinutes": 8,
+        "tags": ["ev-yemegi", "doner", "corba"]
+      }
+    ]
+  },
+  {
+    "id": "r29",
+    "name": "Turkish Döner",
+    "cuisine": "Döner & Dürüm",
+    "image": "assets/turkish_doner.jpg",
+    "rating": 4.1,
+    "deliveryMinutes": 22,
+    "distanceKm": 2.0,
+    "priceLevel": 2,
+    "tags": ["doner", "durum", "tavuk-doner"],
+    "menu": [
+      {
+        "id": "m57",
+        "name": "Özel Soslu Tavuk Döner Dürüm",
+        "image": "assets/turkish_doner.jpg",
+        "price": 260,
+        "ingredients": ["tavuk döner", "özel sos", "yeşillik", "lavaş"],
+        "allergens": ["gluten"],
+        "calories": 510,
+        "prepMinutes": 8,
+        "tags": ["doner", "durum", "orta-acili"]
+      },
+      {
+        "id": "m58",
+        "name": "Hatay Usulü Döner Dürüm",
+        "image": "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=500&auto=format&fit=crop&q=80",
+        "price": 280,
+        "ingredients": ["lavaş", "soslu tavuk döner", "turşu", "patates"],
+        "allergens": ["gluten"],
+        "calories": 560,
+        "prepMinutes": 9,
+        "tags": ["doner", "durum", "cok-acili"]
+      }
+    ]
   }
 ];
 
