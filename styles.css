@@ -3214,9 +3214,7 @@ body {
 .modal-blue-hero-header {
   background: linear-gradient(135deg, #0b2253 0%, #18113c 100%);
   color: #ffffff;
-  /* Sheet'in üst padding'i 0 olduğu için negatif üst margin yok; hero
-     doğrudan sheet'in tepesinden başlar ve aynı köşe yarıçapını kullanır */
-  padding: 22px 18px 22px;
+  padding: 44px 18px 22px;
   border-radius: 28px 28px 0 0;
   margin: 0 -18px 16px -18px;
   position: relative;
@@ -3245,7 +3243,7 @@ body {
 }
 .modal-blue-hero-header .modal-close-btn {
   position: absolute;
-  top: 16px;
+  top: 36px;
   right: 16px;
   background: rgba(255, 255, 255, 0.15);
   color: #ffffff;
@@ -4101,11 +4099,11 @@ body {
   /* tier-modal-content padding'ini (10px 18px) iptal edip kenarlara yasla */
   margin: 0 -18px 16px -18px;
   border-radius: 28px 28px 22px 22px;
-  padding: 24px 18px 20px;
+  padding: 44px 18px 20px;
 }
 .modal-close-btn.on-card {
   position: absolute;
-  top: 14px;
+  top: 36px;
   left: 14px;
   right: auto;
   background: rgba(255, 255, 255, 0.16);
