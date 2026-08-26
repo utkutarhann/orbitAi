@@ -2259,7 +2259,7 @@ function initDelivery() {
   const rest = STATE.activeRestaurant || (ao ? { name: ao.storeName } : null) || { name: "Yeşil Kase" };
 
   const signals = [
-    { id: "courier", icon: "🛵", label: "Kurye konumu", detail: "2.1 km uzaklıkta", delta: 12, base: true },
+    { id: "courier", icon: "🛵", label: "Kurye konumu", detail: "Eve 5 dk uzaklıkta", delta: 5, base: true },
     { id: "traffic", icon: "🚦", label: "Trafik Yoğunluğu", detail: "yoğun", delta: 5, level: "high" },
     { id: "kitchen", icon: "🍳", label: `Mutfak yoğunluğu · ${rest.name}`, detail: "normal", delta: 0, level: "ok" },
     { id: "weather", icon: "🌧️", label: "Hava Koşulları", detail: rainy ? "yağmurlu" : "açık", delta: rainy ? 2 : 0, level: rainy ? "warn" : "ok" }
@@ -2313,9 +2313,6 @@ function renderTracking() {
           <div class="eta-big"><span id="etaMinVal">${remainingMin()}</span><small>dk</small></div>
           <div class="eta-meta">
             <p class="eta-clock">Tahmini teslim <strong id="etaClock">${deliveryClock()}</strong></p>
-            ${d.delayMin >= 5
-              ? `<span class="eta-delay-badge">${d.delayMin} dk gecikme</span>`
-              : `<span class="eta-ontime-badge">Zamanında</span>`}
           </div>
         </div>
         ${d.delayMin >= 5 ? `
