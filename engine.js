@@ -441,6 +441,21 @@ function fallbackLocalAi(query) {
       martHandoff: getMartHandoff(query),
       followups: ["Akşam yemeği için hafif bir şey 🍲", "Sıcak ev yemeği & çorba 🥣"]
     };
+  if (/salata|bowl/i.test(query)) {
+    const catalog = buildMenuCatalog();
+    const saladItems = catalog.filter(x => x.tags && (x.tags.includes("salata") || x.tags.includes("bowl"))).slice(0, 4);
+    return {
+      isRealAi: false,
+      intent: "food",
+      thinkingSteps: [
+        "Taze ve sağlıklı salata & bowl restoranları sorgulanıyor.",
+        "Besleyici alternatifler derleniyor…"
+      ],
+      companionMessage: "Taze ve sağlıklı bir salata arıyorsun! Makarina Bowl & Salad ve Go Green Bowl başta olmak üzere en sevilen taze salata alternatiflerini aşağıda senin için derledim. Dilersen Orbit Mart'tan Salata malzemelerini sipariş edip evde pratikçe hazırlaman için market kartını da alt kısma ekledim:",
+      results: saladItems.length ? saladItems : aiSearch(query),
+      martHandoff: getMartHandoff("salata"),
+      followups: ["Hafif & proteinli salata 🥗", "Doyurucu kinoa bowl 🥣"]
+    };
   }
 
   const results = aiSearch(query);

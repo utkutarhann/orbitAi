@@ -1482,6 +1482,76 @@ const RESTAURANTS = [
         "tags": ["ev-yemegi", "doyurucu"]
       }
     ]
+  },
+  {
+    "id": "r33",
+    "name": "Makarina Bowl & Salad",
+    "cuisine": "Salata & Bowl",
+    "image": "assets/makarina_salad.jpg",
+    "rating": 4.4,
+    "deliveryMinutes": 15,
+    "distanceKm": 1.1,
+    "priceLevel": 2,
+    "tags": ["salata", "bowl", "hafif", "vejetaryen"],
+    "menu": [
+      {
+        "id": "m65",
+        "name": "Roka Salata",
+        "image": "assets/makarina_salad.jpg",
+        "price": 399.50,
+        "ingredients": ["roka", "ceviz", "tulum peyniri", "zeytin", "kruton", "nar ekşisi"],
+        "allergens": ["süt ürünleri", "gluten"],
+        "calories": 340,
+        "prepMinutes": 6,
+        "tags": ["salata", "hafif", "vejetaryen"]
+      },
+      {
+        "id": "m66",
+        "name": "Izgara Tavuklu Kinoa Bowl",
+        "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=80",
+        "price": 420,
+        "ingredients": ["kinoa", "ızgara tavuk göğsü", "avokado", "mısır", "yeşillik"],
+        "allergens": [],
+        "calories": 460,
+        "prepMinutes": 8,
+        "tags": ["salata", "bowl", "protein"]
+      }
+    ]
+  },
+  {
+    "id": "r34",
+    "name": "Go Green Bowl",
+    "cuisine": "Dünya Mutfağı & Salata",
+    "image": "assets/go_green_bowl.jpg",
+    "rating": 4.3,
+    "deliveryMinutes": 18,
+    "distanceKm": 1.4,
+    "priceLevel": 2,
+    "tags": ["salata", "bowl", "pesketaryen", "hafif"],
+    "menu": [
+      {
+        "id": "m67",
+        "name": "Ton Balıklı Salata",
+        "image": "assets/go_green_bowl.jpg",
+        "price": 519.95,
+        "ingredients": ["ton balığı", "marul", "çeri domates", "salatalık", "mısır", "zeytinyağı"],
+        "allergens": [],
+        "calories": 380,
+        "prepMinutes": 7,
+        "tags": ["salata", "pesketaryen", "hafif", "protein"]
+      },
+      {
+        "id": "m68",
+        "name": "Avokadolu Sezar Salata",
+        "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&auto=format&fit=crop&q=80",
+        "price": 460,
+        "ingredients": ["marul", "avokado", "sezar sos", "parmesan", "kruton"],
+        "allergens": ["süt ürünleri", "gluten"],
+        "calories": 410,
+        "prepMinutes": 6,
+        "tags": ["salata", "vejetaryen", "hafif"]
+      }
+    ]
   }
 ];
 
