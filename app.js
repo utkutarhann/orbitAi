@@ -67,7 +67,7 @@ function currentTier() {
 function getTierBadge(user) {
   const tier = computeTier(user || STATE.user);
   const cls = tier === "Prime" ? "prime" : tier === "Plus" ? "plus" : "base";
-  return { tier, cls, label: `✦ ${tier.toUpperCase()}`, memberLabel: `✦ ${tier.toUpperCase()} ÜYE` };
+  return { tier, cls, label: `✦ ${tier.toUpperCase()}`, memberLabel: `✦ ${tier.toUpperCase()}` };
 }
 
 function tl(n) {
@@ -238,7 +238,7 @@ const SCENARIO_DEFS = {
     gradient: "linear-gradient(145deg, #064E3B 0%, #0F766E 50%, #0D9488 100%)",
     greeting: "Günaydın, Baki ☀️",
     sub: "Güne taze ve enerjik bir başlangıç yap. Fırından yeni çıkmış çıtır lezzetler senin için hazır.",
-    badge: { cls: "plus", label: "✦ PLUS ÜYE" },
+    badge: { cls: "plus", label: "✦ PLUS" },
     swipeRail: true,  // Ana içerikte swipe edilebilir restoran önerileri göster
     aiMessage: "Yukarıdaki seçeneklerin sana uygun olabileceğini düşündüm. Değilse bana nasıl bir şeyler yemek istediğini söyleyebilirsin.",
     momentCard: {
@@ -263,7 +263,7 @@ const SCENARIO_DEFS = {
     gradient: "linear-gradient(145deg, #0C2340 0%, #1D4ED8 50%, #2563EB 100%)",
     greeting: "İyi Günler, Baki ⚡",
     sub: "Öğle arası en verimli şekilde değerlendirebileceğin restorantlar için Sana Özel'e bakmayı unutma!",
-    badge: { cls: "plus", label: "✦ PLUS ÜYE" },
+    badge: { cls: "plus", label: "✦ PLUS" },
     swipeRail: true,
     aiMessage: "Yukarıdaki seçeneklerin sana uygun olabileceğini düşündüm. Değilse bana nasıl bir şeyler yemek istediğini söyleyebilirsin.",
     momentCard: {
@@ -288,7 +288,7 @@ const SCENARIO_DEFS = {
     gradient: "linear-gradient(145deg, #09122C 0%, #112046 50%, #1A1842 100%)",
     greeting: "İyi Akşamlar, Baki 🌙",
     sub: "Dışarısı serin. İçini ısıtacak lezzetler için doğru yerdesin.",
-    badge: { cls: "plus", label: "✦ PLUS ÜYE" },
+    badge: { cls: "plus", label: "✦ PLUS" },
     momentCard: {
       id: "sc-aksam", badge: "🌙 AKŞAM MOLASI", title: "Akşam Molası Başlasın",
       sub: "Sıcak çorba, ev yemekleri ve taze fırınlar", emoji: "🍲", tone: "night",
@@ -305,7 +305,7 @@ const SCENARIO_DEFS = {
     gradient: "linear-gradient(145deg, #4A044E 0%, #831843 50%, #9D174D 100%)",
     greeting: "İyi ki Doğdun, Baki! 🎉",
     sub: "Bugün senin günün! Doğum günü hediyen hazır.",
-    badge: { cls: "plus", label: "✦ PLUS ÜYE" },
+    badge: { cls: "plus", label: "✦ PLUS" },
     momentCard: {
       id: "sc-dogumgunu", badge: "🎁 İYİ Kİ DOĞDUN", title: "Doğum Günü Hediyen",
       sub: "Sana özel hediyeni seçmek için tıkla 🎁", emoji: "🎂", tone: "birthday",
