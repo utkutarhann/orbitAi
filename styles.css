@@ -5291,14 +5291,19 @@ body {
   margin: 0 -18px -22px;
   padding: 16px 18px 22px;
 }
-.tier-modal-content:has(.prominent-loyalty-card.full-bleed) { background: #0b2253; }
-/* Beyaz gövde sheet'in tam genişliğini kaplamalı; aksi halde yanlarda
-   sheet zemininin lacivertı şerit gibi görünüyordu. Negatif margin sayfa
-   payını iptal eder, aynı payı padding olarak geri verir. */
+.tier-modal-content:has(.prominent-loyalty-card.full-bleed) {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: #0b2253;
+}
 .tier-modal-content:has(.prominent-loyalty-card.full-bleed) > .tier-modal-body {
   background: #ffffff;
   margin: 0 -18px -22px;
-  padding: 0 18px 22px;
+  padding: 16px 18px 22px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* Gecikme telafisi: aksiyon değil, olmuş bitmiş bir bilgi */
