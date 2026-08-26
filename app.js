@@ -1427,7 +1427,7 @@ function renderPreferences() {
               </div>
               <ul id="tierRulesContent" style="display:none; margin-top:10px;">
                 <li>Nakit iadeler doğrudan <strong>Orbit Pay bakiyene</strong> yatar.</li>
-                <li>Seviyen <strong>son 90 günlük işlem hareketlerine</strong> göre hesaplanır. 3 ay içinde bir üst segmente geçebilirsin; alt segmente düşüş değerlendirmesi <strong>3 aylık periyot sonunda</strong> yapılır.</li>
+                <li>Kullanıcıların bir üst segmentteki şartları sağlaması halinde, beklemeye gerek kalmadan üst segmente geçişi olacaktır. Alt segmente düşüş değerlendirmesi <strong>3 aylık periyot sonunda</strong> yapılır.</li>
                 <li>Nakit iade yalnızca <strong>Orbit Pay ile yapılan harcamalarda</strong> yüklenir.</li>
                 <li>Nakit iadeler <strong>devredilemez</strong> ve nakit olarak transfer edilemez.</li>
                 <li>Sadakat programı başladığı anda kullanıcılar <strong>ilave bir işlem yapmaksızın</strong> mevcut durumlarına göre ilgili segmentasyona geçer.</li>
