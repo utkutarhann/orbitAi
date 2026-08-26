@@ -3702,11 +3702,11 @@ function handleOrderSupportFlow(text, typingMsg) {
 
   if (/iptal/i.test(t)) {
     steps = [
-      `🧾 ${storeName} canlı sipariş ve mutfak durumu inceleniyor…`,
-      "Kurye teslimat aşaması kontrol ediliyor…"
+      `🧾 Restoran ve kurye sisteminden canlı sipariş durumu doğrulanıyor…`,
+      "Kurye teslimat hattı kontrol ediliyor…"
     ];
-    responseText = `${storeName} siparişin hazırlanıp kuryeye teslim edildiği ve yolda olduğu için sistem üzerinden anlık otomatik iptal sağlanamıyor. Ancak restoran ve kurye ekibimize bilgi iletildi. Sipariş adresine ulaştığında kapıda teslim almayarak iade sürecini başlatabilirsin veya dilersen canlı destek ekibimize aktarabilirim.`;
-    followups = ["Siparişim nerede", "Canlı desteğe aktar"];
+    responseText = "Aldığım bilgiler sonrasında siparişinin yolda olduğunu teyit ettim. Ne yazık ki dağıtıma çıkartılan siparişleri sistem üzerinden iptal edemiyoruz. Sipariş adresine ulaştığında dilersen teslim almayabilirsin, bir sorun yaşarsan hemen bana yazabilirsin.";
+    followups = ["Sipariş ne zaman gelir?", "Kurye nerede?"];
   }
   // 3. Tahmini süre nedir?
   else if (/tahmini.*süre|teslimat.*süre|kalan.*süre/i.test(t)) {
