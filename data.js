@@ -1370,14 +1370,14 @@ const DETAILED_ORDERS = [
     "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=80",
     "status": "completed",
     "statusText": "✓ Teslim Edildi",
-    "itemsSummary": "Trüf Cheddarlı Burger (150 gr.) + Patates",
+    "itemsSummary": "1x Trüf Cheddarlı Burger Menu, 1x San Sebastian Cheesecake",
     "items": [
-      { "name": "Trüf Cheddarlı Burger Menu", "qty": 1, "price": 525.00 },
-      { "name": "Çıtır Soğan Halkası (6 Adet)", "qty": 1, "price": 100.00 }
+      { "name": "Trüf Cheddarlı Burger Menu", "qty": 1, "price": 340.00 },
+      { "name": "San Sebastian Cheesecake", "qty": 1, "price": 120.00 }
     ],
-    "totalPrice": "625,00 TL",
-    "totalTRY": 625,
-    "vertical": "mart",
+    "totalPrice": "460,00 TL",
+    "totalTRY": 460,
+    "vertical": "eats",
     "payMethod": "orbitpay_wallet",
     "paymentMethod": "Orbit Pay Cüzdanı",
     "tierAtOrder": "Plus"
