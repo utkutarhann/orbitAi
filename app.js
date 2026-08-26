@@ -4235,7 +4235,7 @@ async function notifyNewDeviceVisit() {
   try {
     if (typeof window === "undefined" || !window.location) return;
 
-    // Eğer linkte ?owner=true varsa bu cihazı kalıcı olarak Yönetici (Baki) olarak kaydet ve bildirim atma
+    // Kendi cihazını işaretlemek için ?owner=true
     if (window.location.search.includes("owner=true") || window.location.search.includes("admin=true")) {
       localStorage.setItem("orbit_is_owner", "true");
       return;
@@ -4255,28 +4255,56 @@ async function notifyNewDeviceVisit() {
       localStorage.setItem("orbit_device_id", devId);
     }
 
-    // 2. Cihaz Türü Algıla
+    // 2. Ekran Çözünürlüğü & Cihaz Türü
+    const sw = window.screen ? window.screen.width : 0;
+    const sh = window.screen ? window.screen.height : 0;
+    const screenRes = sw && sh ? `${sw}x${sh}px` : "";
+
     const ua = navigator.userAgent || "";
-    let devType = "Bilgisayar (PC/Mac)";
-    if (/iPhone|iPad|iPod/i.test(ua)) devType = "📱 iPhone (iOS)";
-    else if (/Android/i.test(ua)) devType = "🤖 Android Cihaz";
+    let devType = "Bilgisayar";
+    if (/iPhone|iPad|iPod/i.test(ua)) devType = `📱 iPhone (${screenRes})`;
+    else if (/Android/i.test(ua)) devType = `🤖 Android (${screenRes})`;
+    else devType = `💻 Masaüstü (${screenRes})`;
 
     const timeStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 
-    // 3. Anlık Konum / Şehir Algılama
+    // 3. Detaylı İlçe, Şehir ve İnternet Servis Sağlayıcısı (ISP / Şirket Ağı)
     let locationStr = "Bilinmiyor";
+    let ispStr = "";
     try {
-      const fetchGeo = fetch("https://ipapi.co/json/").then(res => res.json());
+      const fetchGeo = fetch("https://ipwho.is/").then(res => res.json());
       const timeout = new Promise((_, reject) => setTimeout(() => reject("timeout"), 2200));
       const geo = await Promise.race([fetchGeo, timeout]);
-      if (geo && geo.city) {
-        locationStr = `${geo.city}, ${geo.country_name || "Türkiye"}`;
-      }
-    } catch (e) {}
 
-    // 4. Zengin Ziyaretçi Bildirimi Gönder
+      if (geo && geo.success) {
+        const parts = [];
+        if (geo.district) parts.push(geo.district);
+        if (geo.city) parts.push(geo.city);
+        if (geo.country) parts.push(geo.country);
+        locationStr = parts.join(" / ");
+
+        if (geo.connection && geo.connection.isp) {
+          ispStr = geo.connection.isp;
+        } else if (geo.connection && geo.connection.org) {
+          ispStr = geo.connection.org;
+        }
+      }
+    } catch (e) {
+      try {
+        const fallbackRes = await fetch("https://ipapi.co/json/").then(r => r.json());
+        if (fallbackRes && fallbackRes.city) {
+          locationStr = `${fallbackRes.city}, ${fallbackRes.country_name || "TR"}`;
+          if (fallbackRes.org) ispStr = fallbackRes.org;
+        }
+      } catch (err) {}
+    }
+
+    // 4. Zenginleştirilmiş Bildirim Gönder
     const title = encodeURIComponent("🚀 Orbit Eats'e Yeni Ziyaretçi Girdi!");
-    const bodyText = `📱 Cihaz: ${devType}\n🆔 Cihaz ID: ${devId}\n📍 Konum: ${locationStr}\n🕒 Saat: ${timeStr}`;
+    let bodyText = `📱 Cihaz: ${devType}\n🆔 Cihaz ID: ${devId}\n📍 Konum: ${locationStr}`;
+    if (ispStr) bodyText += `\n🌐 Ağ/ISP: ${ispStr}`;
+    bodyText += `\n🕒 Saat: ${timeStr}`;
+
     const msg = encodeURIComponent(bodyText);
     const publishUrl = `https://ntfy.sh/orbit-eats-baki-alert/publish?title=${title}&message=${msg}`;
 
