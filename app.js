@@ -1238,8 +1238,7 @@ function tierConditionsHTML(tier) {
         now: tenureDays, target: TIER_THRESHOLDS.Prime.minTenureDays,
         fmt: (n) => `${Math.floor(n / 30)} ay`,
         leftLabel: (n) => `${Math.ceil(n / 30)} ay daha üyelik gerekiyor`, step: "3"
-      })
-    + `<p class="tier-note">Üç şartın <strong>tamamı</strong> sağlanmalıdır.</p>`;
+      });
 }
 
 function tierBenefitsHTML(tier) {
@@ -1258,7 +1257,7 @@ function tierBenefitsHTML(tier) {
       : "";
 
   const extras = tier === "Prime"
-    ? item("⚡", "Öncelikli kurye", "Orbit Pay ile ödediğin siparişlere kurye önceliği tanımlanır.")
+    ? item("⚡", "Öncelikli kurye", "Siparişlerine kurye ve teslimat önceliği tanımlanır.")
     : "";
 
   return delivery
@@ -1726,8 +1725,11 @@ function openRestaurant(restaurantId, highlightItemId) {
       <div class="section-title"><span>Menü</span></div>
       ${r.menu.map(m => menuRowHTML(m, m.id === highlightItemId)).join("")}
       <button class="btn-primary go-cart-bar" id="goCart" style="${cartCount() ? "" : "display:none"}">
-        <span>Sepete Git (${cartCount()} ürün)</span>
-        <strong>Toplam Tutar: ${cartTotal()} TL ›</strong>
+        <span class="gcb-left">Sepete Git (${cartCount()} ürün)</span>
+        <span class="gcb-right">
+          <span class="gcb-total">Toplam: <strong>${cartTotal()} TL</strong></span>
+          <span class="gcb-arrow">›</span>
+        </span>
       </button>
     </div>
   `;
