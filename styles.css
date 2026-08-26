@@ -5594,17 +5594,48 @@ body {
 /* Ekran başlıkları ortalanır; geri ve sağdaki aksiyonlar kenarlara sabitlenir */
 .screen-header {
   position: relative;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  min-height: 42px;
-  padding-top: 24px;
+  min-height: 44px;
+  padding-top: 14px;
   margin-top: 6px;
 }
-.screen-header > .back-btn { position: absolute; left: 14px; top: 22px; }
-.screen-header > .ai-switch { position: absolute; right: 14px; top: 22px; }
-.screen-header > div { flex: none; text-align: center; }
-.screen-header .screen-title { text-align: center; }
-/* Sohbet başlıkları da logo + metin olarak ortada dursun */
-.screen-header .chat-header-title { justify-content: center; }
+.screen-header > .back-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+.screen-header > .ai-switch {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+.screen-header > div {
+  flex: 1;
+  width: 100%;
+  text-align: center;
+  padding: 0 46px;
+}
+.screen-header .screen-title {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.screen-header .screen-subtitle {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.screen-header .chat-header-title {
+  justify-content: center;
+}
 
 /* Hero üst bölümünde dikey nefes */
 .home-hero .hero-greeting-row { margin-top: 6px; }
