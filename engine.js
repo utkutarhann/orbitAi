@@ -347,7 +347,7 @@ GÖREVİN:
           ],
           companionMessage: parsed.companionMessage || "Senin için en uygun seçenekleri belirledim:",
           results: matchedItems,
-          martHandoff: isChitchat ? null : (normalizeMartHandoff(parsed.martHandoff) || getMartHandoff(userMessage)),
+          martHandoff: isChitchat ? null : (normalizeMartHandoff(parsed.martHandoff) || getMartHandoff(query)),
           followups: parsed.followups || ["Daha uygun fiyatlı olsun", "Başka bir şey öner"]
         };
         AI_CACHE.set(cacheKey, sonuc);

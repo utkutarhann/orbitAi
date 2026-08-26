@@ -3513,31 +3513,49 @@ async function handleChatMessage(text, opts) {
   setChatGenerating(true);
   renderChatMessages();
 
-  // Gemini API veya Yerel Fallback
-  const aiData = await callGeminiCompanion(text);
-  const results = aiData.results;
-  const groups = buildResultGroups(results);
+  try {
+    // Gemini API veya Yerel Fallback
+    const aiData = await callGeminiCompanion(text);
+    const results = (aiData && aiData.results) || [];
+    const groups = buildResultGroups(results);
 
-  const i = STATE.chatMessages.indexOf(typingMsg);
-  if (i > -1) STATE.chatMessages.splice(i, 1);
+    const i = STATE.chatMessages.indexOf(typingMsg);
+    if (i > -1) STATE.chatMessages.splice(i, 1);
 
-  if (results.length === 0) {
+    if (results.length === 0) {
+      STATE.chatMessages.push({
+        role: "assistant",
+        text: (aiData && aiData.companionMessage) || "Bu tarife uygun bir restoran menüsü bulamadım — dilersen evde hazırlamak için market malzemelerini aşağıya ekledim!",
+        martHandoff: aiData && aiData.martHandoff,
+        followups: (aiData && aiData.followups) || ["Daha uygun fiyatlı olsun", "Başka bir şey öner"]
+      });
+    } else {
+      STATE.chatMessages.push({
+        role: "assistant",
+        text: aiData.companionMessage,
+        groups,
+        martHandoff: aiData.martHandoff,
+        followups: aiData.followups
+      });
+    }
+  } catch (err) {
+    console.error("⚠️ [Orbit AI] Chat işleme hatası:", err);
+    const i = STATE.chatMessages.indexOf(typingMsg);
+    if (i > -1) STATE.chatMessages.splice(i, 1);
+
+    const fallback = typeof fallbackLocalAi === "function" ? fallbackLocalAi(text) : null;
+    const fallbackResults = (fallback && fallback.results) || [];
     STATE.chatMessages.push({
       role: "assistant",
-      text: aiData.companionMessage || "Bu tarife uygun bir şey bulamadım — bütçeyi ya da mutfağı biraz değiştirelim mi?",
-      followups: aiData.followups
+      text: (fallback && fallback.companionMessage) || "Aradığın lezzet için seçenekleri ve evde hazırlama tarif malzemelerini derledim.",
+      groups: buildResultGroups(fallbackResults),
+      martHandoff: typeof getMartHandoff === "function" ? getMartHandoff(text) : null,
+      followups: ["Akşam yemeği için hafif bir şey 🍲", "Sıcak ev yemeği & çorba 🥣"]
     });
-  } else {
-    STATE.chatMessages.push({
-      role: "assistant",
-      text: aiData.companionMessage,
-      groups,
-      martHandoff: aiData.martHandoff,
-      followups: aiData.followups
-    });
+  } finally {
+    setChatGenerating(false);
+    renderChatMessages();
   }
-  setChatGenerating(false);
-  renderChatMessages();
 }
 
 function reflectIntent(text, signals) {
