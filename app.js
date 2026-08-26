@@ -3158,7 +3158,7 @@ function getContextualQuickPrompts() {
     aksam: [
       "Akşam yemeği için hafif bir şey 🍲",
       "Sıcak ev yemeği & çorba 🥣",
-      "Bütçem 200 TL, doyurucu bir şey 💳"
+      "Bütçem 500 TL, doyurucu bir şey 💳"
     ],
     dogumgunu: [
       "Bugün kendimi mutlu hissediyorum! 🎉",
