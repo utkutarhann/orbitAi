@@ -372,8 +372,7 @@ GÖREVİN:
         } catch (e) {}
         QUOTA_STATE.cooldownUntil = Date.now() + bekle * 1000;
         QUOTA_STATE.exhausted = true;
-        console.warn(`🚫 [Orbit AI] Günlük Gemini kotası doldu (limit: ${QUOTA_STATE.limit}/gün). ` +
-          `${Math.ceil(bekle)} sn boyunca yerel motor kullanılacak.`);
+        console.warn(`🚫 [Orbit AI] Günlük Gemini kotası doldu (${Math.ceil(bekle)} sn). Yerel motor devrede.`);
         break;
       } else {
         const errText = await response.text();
@@ -390,14 +389,14 @@ GÖREVİN:
 
 /* Yerel motorda basit niyet ayrımı: sorguda yemekle ilgili hiçbir sinyal
    yoksa liste çıkarmak yerine kısa bir karşılık verip konuyu yemeğe getiriyoruz. */
-const FOOD_HINTS = /yemek|yiyecek|iç(ecek|mek)|aç|açlık|kahvaltı|öğle|akşam|atıştır|tatlı|çorba|salata|pizza|burger|kebap|dürüm|sushi|makarna|pilav|börek|mantı|tavuk|et |balık|vegan|vejetaryen|diyet|kalori|bütçe|tl |sipariş|menü|restoran|mutfak|lezzet|doyur|hafif|acı|sıcak bir şey|canım.*çek/i;
+const FOOD_HINTS = /musakka|döner|doner|köfte|kofte|sarma|lokanta|yemek|yiyecek|iç(ecek|mek)|aç|açlık|kahvaltı|öğle|akşam|atıştır|tatlı|çorba|salata|pizza|burger|kebap|dürüm|sushi|makarna|pilav|börek|mantı|tavuk|et |balık|vegan|vejetaryen|diyet|kalori|bütçe|tl |sipariş|menü|restoran|mutfak|lezzet|doyur|hafif|acı|sıcak bir şey|canım.*çek/i;
 
 function looksLikeFoodRequest(query) {
   const q = (query || "").trim();
   if (!q) return false;
   if (FOOD_HINTS.test(q)) return true;
   // Katalogla anlamlı bir kelime eşleşmesi varsa yine yemek isteğidir
-  return buildMenuCatalog().some(it => keywordScore(it, q) > 0);
+  return buildMenuCatalog().some(it => keywordScore(it, q).score > 0);
 }
 
 function fallbackLocalAi(query) {
@@ -447,6 +446,8 @@ function fallbackLocalAi(query) {
       martHandoff: getMartHandoff(query),
       followups: ["Akşam yemeği için hafif bir şey 🍲", "Sıcak ev yemeği & çorba 🥣"]
     };
+  }
+
   if (/salata|bowl/i.test(query)) {
     const catalog = buildMenuCatalog();
     const saladItems = catalog.filter(x => x.tags && (x.tags.includes("salata") || x.tags.includes("bowl"))).slice(0, 4);
@@ -476,7 +477,7 @@ function fallbackLocalAi(query) {
     ],
     companionMessage: results.length > 1
       ? `${ctx.greeting}! ${ctx.label} için sana uygun ${results.length} lezzet buldum:`
-      : (results.length === 1 ? `${ctx.greeting}! Sana uygun bir seçenek buldum:` : "Bu tarife uygun bir şey bulamadım — bütçeyi ya da mutfağı biraz değiştirelim mi?"),
+      : (results.length === 1 ? `${ctx.greeting}! Sana uygun bir seçenek buldum:` : "Bu tarife uygun bir şeyler hazırladım, senin için seçenekleri aşağıya sıralıyorum:"),
     results: results,
     martHandoff: getMartHandoff(query),
     followups: getScenarioFollowups(ctx.segment)
