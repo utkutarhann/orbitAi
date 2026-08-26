@@ -1569,31 +1569,57 @@ function renderPreferences() {
   });
 }
 
-/* ---------------- Natural Language Search ---------------- */
+/* ---------------- Natural Language & Static Search ---------------- */
+function searchStaticCatalog(query) {
+  if (!query || !query.trim()) return [];
+  const qNorm = (typeof normalizeTerm === "function" ? normalizeTerm(query) : query.toLowerCase().trim());
+  const terms = qNorm.split(/\s+/).filter(t => t.length >= 2);
+  const results = [];
+
+  const rests = (STATE.restaurants && STATE.restaurants.length) ? STATE.restaurants : (typeof RESTAURANTS !== "undefined" ? RESTAURANTS : []);
+
+  rests.forEach(r => {
+    const rName = typeof normalizeTerm === "function" ? normalizeTerm(r.name) : r.name.toLowerCase();
+    const rCuisine = typeof normalizeTerm === "function" ? normalizeTerm(r.cuisine) : r.cuisine.toLowerCase();
+    const rTags = typeof normalizeTerm === "function" ? normalizeTerm((r.tags || []).join(" ")) : (r.tags || []).join(" ").toLowerCase();
+
+    const isRestMatch = rName.includes(qNorm) || qNorm.includes(rName) || terms.some(t => rName.includes(t) || rCuisine.includes(t) || rTags.includes(t));
+
+    (r.menu || []).forEach(m => {
+      const mName = typeof normalizeTerm === "function" ? normalizeTerm(m.name) : m.name.toLowerCase();
+      const mIng = typeof normalizeTerm === "function" ? normalizeTerm((m.ingredients || []).join(" ")) : (m.ingredients || []).join(" ").toLowerCase();
+      const mTags = typeof normalizeTerm === "function" ? normalizeTerm((m.tags || []).join(" ")) : (m.tags || []).join(" ").toLowerCase();
+
+      const isMenuMatch = isRestMatch || mName.includes(qNorm) || qNorm.includes(mName) || terms.some(t => mName.includes(t) || mIng.includes(t) || mTags.includes(t));
+
+      if (isMenuMatch) {
+        results.push({
+          itemId: m.id,
+          itemName: m.name,
+          restaurantId: r.id,
+          restaurantName: r.name,
+          price: m.price,
+          rating: r.rating,
+          deliveryMinutes: r.deliveryMinutes,
+          distanceKm: r.distanceKm,
+          allergens: m.allergens,
+          tags: m.tags || [],
+          image: m.image || r.image
+        });
+      }
+    });
+  });
+
+  return results;
+}
+
 function runAiSearch(query) {
   resetScreenChrome();
   STATE.lastQuery = query;
-  root.innerHTML = `
-    <div class="screen">
-      <div class="screen-header">
-        <button class="back-btn" id="back">‹</button>
-        <div>
-          <p class="screen-title">"${query}"</p>
-        </div>
-      </div>
-      <div class="ai-thinking">
-        <div class="pulse-dot"></div>
-        <span>Sana en uygun seçenekleri arıyorum…</span>
-      </div>
-    </div>
-  `;
-  document.getElementById("back").addEventListener("click", renderHome);
-
-  setTimeout(() => {
-    const results = aiSearch(query);
-    STATE.lastSearchResults = results;
-    renderSearchResults(results, query);
-  }, 450);
+  const staticResults = searchStaticCatalog(query);
+  const results = staticResults.length > 0 ? staticResults : aiSearch(query);
+  STATE.lastSearchResults = results;
+  renderSearchResults(results, query);
 }
 
 function renderSearchResults(results, query) {

@@ -124,7 +124,13 @@ function aiQuotaStatus() {
 
 function shortlistForLlm(query, catalog, limit) {
   const signals = parseQuerySignals(query);
-  catalog = (catalog || []).filter(passesProfileDiet);
+  const qNorm = normalizeTerm(query);
+  const matchesRestaurantDirectly = (catalog || []).some(it => {
+    const rName = normalizeTerm(it.restaurantName);
+    return rName.includes(qNorm) || qNorm.includes(rName) || qNorm.split(/\s+/).some(t => t.length >= 3 && rName.includes(t));
+  });
+
+  catalog = matchesRestaurantDirectly ? (catalog || []) : (catalog || []).filter(passesProfileDiet);
   /* Katalog ne kadar uzunsa model o kadar uzun düşünüyor; 18 kalemde yanıt
      20 sn'yi aşıyordu. En alakalı 12 kalem seçim için fazlasıyla yeterli. */
   return catalog
