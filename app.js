@@ -1185,7 +1185,7 @@ function tierConditionsHTML(tier) {
   const plainRow = (state, icon, title, sub) => `
     <div class="tier-condition-item ${state}">
       <span class="cond-icon">${icon}</span>
-      <div class="cond-text"><strong>${title}</strong><span class="cond-sub ${state === "pending" ? "red" : ""}">${sub}</span></div>
+      <div class="cond-text"><strong>${title}</strong><span class="cond-sub">${sub}</span></div>
     </div>`;
 
   const money = (n) => tl(n);

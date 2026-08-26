@@ -3285,10 +3285,6 @@ body {
   flex-shrink: 0;
   margin-top: 1px;
 }
-.tier-condition-item.pending .cond-icon {
-  background: #fef3c7;
-  color: #d97706;
-}
 .cond-text {
   flex: 1;
 }
@@ -3298,15 +3294,19 @@ body {
   font-weight: 600;
   color: var(--orbit-ink);
 }
+.tier-condition-item.pending .cond-icon {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.tier-condition-item.pending .cond-text strong {
+  color: #dc2626;
+}
 .cond-sub {
   font-size: 11px;
   color: var(--orbit-muted);
+  line-height: 1.45;
   margin-top: 3px;
   display: block;
-}
-.cond-sub.red {
-  color: #dc2626;
-  font-weight: 600;
 }
 .cond-prog-bar {
   height: 6px;
