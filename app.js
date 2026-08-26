@@ -2854,8 +2854,8 @@ async function handleIssueChatMessage(text) {
   STATE.issueChat.messages.push(typingMsg);
   renderIssueChatMessages();
 
-  // Canlı sipariş ve destek sorularında 2.6sn düşünme adımları ve net kibar AI cevabı çalıştırılır:
-  if (handleIssueOrderSupportFlow(text, typingMsg)) {
+  // Canlı sipariş ve destek sorularında 2.6-3sn düşünme adımları ve net kibar AI cevabı çalıştırılır:
+  if (handleOrderSupportFlow(text, typingMsg)) {
     return;
   }
 
@@ -3633,31 +3633,80 @@ function buildResultGroups(results) {
 /* ---------------- ASYNC GEMINI CHAT HANDLER ---------------- */
 function handleOrderSupportFlow(text, typingMsg) {
   const t = (text || "").toLowerCase();
-  const rem = typeof remainingMin === "function" ? remainingMin() : 15;
-  const clock = typeof deliveryClock === "function" ? deliveryClock() : "21:40";
+  const o = (typeof activeOrder === "function" ? activeOrder() : null) || {
+    storeName: "Focus Burger & Gurme Mutfak",
+    itemsSummary: "1x Trüf Cheddarlı Burger Menu, 1x San Sebastian Cheesecake",
+    totalTRY: 460,
+    totalPrice: "460,00 TL",
+    deliveryAddress: "Levent Mah. Konut Sok. No:4 D:8"
+  };
+  const d = (typeof initDelivery === "function" ? initDelivery() : { delayMin: 10 });
+  const rem = typeof remainingMin === "function" ? remainingMin() : 10;
+  const clock = typeof deliveryClock === "function" ? deliveryClock() : "21:45";
+  const storeName = o.storeName || "Focus Burger & Gurme Mutfak";
 
+  const isIssueScreen = !!document.getElementById("issueChatBody");
+  const msgArray = isIssueScreen ? (STATE.issueChat ? STATE.issueChat.messages : []) : STATE.chatMessages;
+  const renderFn = isIssueScreen ? renderIssueChatMessages : renderChatMessages;
+
+  // 1. Kuryeyi arayabilir misin? (AYRI AYRI 2 AŞAMALI AKIŞ)
+  if (/kurye.*(ara|iletişim|telefon)/i.test(t)) {
+    const idx = msgArray.indexOf(typingMsg);
+    if (idx > -1) msgArray.splice(idx, 1);
+
+    // 1. Balon Mesajı
+    msgArray.push({
+      role: "assistant",
+      text: "Kurye ile doğrudan iletişim kuramıyorum ama sistem üzerinden konumunu takip etmeye devam ediyorum."
+    });
+
+    // Düşünme / Yüklenme Kartı (3 saniye gösterim)
+    const stepsMsg = {
+      role: "steps",
+      lines: [
+        "🛵 Kurye GPS konumu ve canlı harita sinyali sorgulanıyor…",
+        "Tahmini varış süresi hesaplanıyor…"
+      ],
+      done: false
+    };
+    msgArray.push(stepsMsg);
+    renderFn();
+
+    // 3 saniye sonra Düşünme Kartı kaybolur ve 2. Balon Mesajı basılır:
+    const timer = setTimeout(() => {
+      stepsMsg.done = true;
+      const sIdx = msgArray.indexOf(stepsMsg);
+      if (sIdx > -1) msgArray.splice(sIdx, 1);
+
+      const followups = ["Sipariş durumunu tekrar kontrol et", "Başka bir konuda yardım istiyorum"];
+      msgArray.push({
+        role: "assistant",
+        text: `Siparişin tahminen ${rem} dakika içerisinde adresine teslim edilecektir.`,
+        followups: followups
+      });
+
+      if (isIssueScreen) setIssueQuickChips(followups);
+      renderFn();
+      setChatGenerating(false);
+    }, 3000);
+
+    chatTimers.push(timer);
+    return true;
+  }
+
+  // 2. İptal etmek istiyorum
   let steps = [];
   let responseText = "";
   let orderCard = false;
   let followups = [];
 
-  // 1. Kuryeyi arayabilir misin?
-  if (/kurye.*ara|kurye.*iletişim|kurye.*telefon/i.test(t)) {
+  if (/iptal/i.test(t)) {
     steps = [
-      "🛵 Kurye telsiz hattına ve GPS konumuna bağlanılıyor…",
-      "Kurye iletişim kanalı ve aktif durum kontrol ediliyor…"
-    ];
-    responseText = "Kuryen Mert K. ile telsiz/sistem hattı üzerinden iletişime geçildi! 🛵 Kuryemiz şu an trafikte seyir halinde ve siparişini en kısa sürede adresine ulaştırmak için ilerliyor. Dilersen uygulama üzerinden doğrudan telefon araması da gerçekleştirebilirsin.";
-    followups = ["Tahmini süre nedir?", "Sipariş nerede"];
-  }
-  // 2. İptal etmek istiyorum
-  else if (/iptal/i.test(t)) {
-    steps = [
-      "🧾 Canlı sipariş ve restoran mutfak durumu inceleniyor…",
+      `🧾 ${storeName} canlı sipariş ve mutfak durumu inceleniyor…`,
       "Kurye teslimat aşaması kontrol ediliyor…"
     ];
-    responseText = "Siparişin hazırlanıp kuryeye teslim edildiği ve yolda olduğu için sistem üzerinden anlık otomatik iptal sağlanamıyor. Ancak restoran ve kurye ekibimize bilgi iletildi. Sipariş adresine ulaştığında kapıda teslim almayarak iade sürecini başlatabilirsin veya dilersen canlı destek ekibimize aktarabilirim.";
-    followups = ["Sipariş nerede", "Canlı desteğe aktar"];
+    responseText = `${storeName} siparişin hazırlanıp kuryeye teslim edildiği ve yolda olduğu için sistem üzerinden anlık otomatik iptal sağlanamıyor. Ancak restoran ve kurye ekibimize bilgi iletildi. Sipariş adresine ulaştığında kapıda teslim almayarak iade sürecini başlatabilirsin veya dilersen canlı destek ekibimize aktarabilirim.`;
+    followups = ["Siparişim nerede", "Canlı desteğe aktar"];
   }
   // 3. Tahmini süre nedir?
   else if (/tahmini.*süre|teslimat.*süre|kalan.*süre/i.test(t)) {
@@ -3665,55 +3714,54 @@ function handleOrderSupportFlow(text, typingMsg) {
       "⏱️ Anlık güzergâh trafiği ve kurye hızı hesaplanıyor…",
       "Tahmini varış süresi güncelleniyor…"
     ];
-    responseText = `Siparişinin adresine ulaşması için tahmini kalan süre: ${rem} dakika (${clock}). Kuryemiz Mert K. şu an yaklaşık 1.8 km mesafede ve lokasyonuna doğru sorunsuz ilerliyor.`;
-    followups = ["Kuryeyi arayabilir misin?", "Sipariş nerede"];
+    responseText = `${storeName} siparişinin adresine ulaşması için tahmini kalan süre: ${rem} dakika (${clock}). Mutfak ve yol yoğunluğu nedeniyle ${d.delayMin || 10} dakika gecikme yaşanmaktadır. Kuryemiz Mert K. şu an yaklaşık 1.8 km mesafede ve lokasyonuna doğru sorunsuz ilerliyor.`;
+    followups = ["Kuryeyi arayabilir misin?", "Siparişim nerede"];
   }
-  // 4. Sipariş nerede?
-  else if (/sipariş.*nerede|siparis.*nerede|sipariş.*durum/i.test(t)) {
+  // 4. Sipariş nerede? / Sipariş durumunu tekrar kontrol et
+  else if (/sipariş.*(nerede|durum|kontrol)/i.test(t)) {
     steps = [
-      "🗺️ Canlı kurye GPS haritası ve restoran sipariş durumu sorgulanıyor…",
-      "Sipariş detayları derleniyor…"
+      `🍔 Aktif sipariş verisi ve restoran bilgileri çekiliyor (${storeName})…`,
+      `🛵 Kurye GPS konumu ve güzergâh gecikmesi doğrulanıyor (+${d.delayMin || 10} dk gecikme)…`
     ];
-    responseText = "Siparişin yolda! En kısa sürede sana ulaştırılacaktır. Canlı sipariş detaylarını ve tahmini teslimat durumunu aşağıda senin için hazırladım:";
+    responseText = `${storeName} siparişin yolda! Mutfak ve yol yoğunluğu nedeniyle ${d.delayMin || 10} dakika gecikme yaşanmaktadır. Canlı sipariş ve teslimat detaylarını aşağıda senin için hazırladım:`;
     orderCard = true;
     followups = ["Tahmini süre nedir?", "Kuryeyi arayabilir misin?"];
   }
-  // 5. Müşteri hizmetlerine bağlan
-  else if (/müşteri (hizmetleri|temsilcisi)|temsilci|canlı destek|bağlan/i.test(t)) {
+  // 5. Müşteri hizmetlerine bağlan / Başka bir konuda yardım istiyorum
+  else if (/müşteri (hizmetleri|temsilcisi)|temsilci|canlı destek|bağlan|yardım istiyorum/i.test(t)) {
     steps = [
       "💬 Kullanıcı profil bilgileri ve aktif sipariş geçmişi hazırlanıyor…",
       "Canlı destek hattına bağlanılıyor…"
     ];
     responseText = "Sana yardım etmek için buradayım, yaşadığın deneyimi anlatır mısın?";
-    followups = ["İptal etmek istiyorum", "Sipariş nerede"];
+    followups = ["İptal etmek istiyorum", "Siparişim nerede"];
   }
 
   if (steps.length === 0) return false;
 
-  // Typing mesajını Düşünme Adımları (steps) kartına çeviriyoruz
   const stepsMsg = { role: "steps", lines: steps, done: false };
-  const idx = STATE.chatMessages.indexOf(typingMsg);
+  const idx = msgArray.indexOf(typingMsg);
   if (idx > -1) {
-    STATE.chatMessages[idx] = stepsMsg;
+    msgArray[idx] = stepsMsg;
   } else {
-    STATE.chatMessages.push(stepsMsg);
+    msgArray.push(stepsMsg);
   }
-  renderChatMessages();
+  renderFn();
 
-  // 2.6 saniye sonra düşünme tamamlanır ve net, kibar AI yanıtı basılır
   const timer = setTimeout(() => {
     stepsMsg.done = true;
-    const sIdx = STATE.chatMessages.indexOf(stepsMsg);
-    if (sIdx > -1) STATE.chatMessages.splice(sIdx, 1);
+    const sIdx = msgArray.indexOf(stepsMsg);
+    if (sIdx > -1) msgArray.splice(sIdx, 1);
 
-    STATE.chatMessages.push({
+    msgArray.push({
       role: "assistant",
       text: responseText,
       orderCard: orderCard,
       followups: followups
     });
 
-    renderChatMessages();
+    if (isIssueScreen) setIssueQuickChips(followups);
+    renderFn();
     setChatGenerating(false);
   }, 2600);
 
