@@ -4231,7 +4231,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
 })();
 
 /* ---------------- Push Notification for New Device Visits ---------------- */
-function notifyNewDeviceVisit() {
+async function notifyNewDeviceVisit() {
   try {
     if (typeof window === "undefined" || !window.location) return;
 
@@ -4243,23 +4243,41 @@ function notifyNewDeviceVisit() {
 
     const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const isOwner = localStorage.getItem("orbit_is_owner") === "true";
-    
-    // Kendi bilgisayarın/cihazın veya localhost ise KESİNLİKLE bildirim gönderme!
     if (isLocal || isOwner) return;
 
-    // Dışarıdan giren farklı cihazlar için aynı sekme oturumunda 1 defa bildirim gönder
     if (sessionStorage.getItem("orbit_visit_notified")) return;
     sessionStorage.setItem("orbit_visit_notified", "true");
 
+    // 1. Benzersiz Cihaz ID (Device ID)
+    let devId = localStorage.getItem("orbit_device_id");
+    if (!devId) {
+      devId = "DEV-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+      localStorage.setItem("orbit_device_id", devId);
+    }
+
+    // 2. Cihaz Türü Algıla
     const ua = navigator.userAgent || "";
-    let devType = "Bilgisayar";
-    if (/iPhone|iPad|iPod/i.test(ua)) devType = "📱 iPhone / iOS";
+    let devType = "Bilgisayar (PC/Mac)";
+    if (/iPhone|iPad|iPod/i.test(ua)) devType = "📱 iPhone (iOS)";
     else if (/Android/i.test(ua)) devType = "🤖 Android Cihaz";
 
     const timeStr = new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 
+    // 3. Anlık Konum / Şehir Algılama
+    let locationStr = "Bilinmiyor";
+    try {
+      const fetchGeo = fetch("https://ipapi.co/json/").then(res => res.json());
+      const timeout = new Promise((_, reject) => setTimeout(() => reject("timeout"), 2200));
+      const geo = await Promise.race([fetchGeo, timeout]);
+      if (geo && geo.city) {
+        locationStr = `${geo.city}, ${geo.country_name || "Türkiye"}`;
+      }
+    } catch (e) {}
+
+    // 4. Zengin Ziyaretçi Bildirimi Gönder
     const title = encodeURIComponent("🚀 Orbit Eats'e Yeni Ziyaretçi Girdi!");
-    const msg = encodeURIComponent(`Farklı bir cihaz uygulamayı açtı!\nCihaz: ${devType}\nSaat: ${timeStr}`);
+    const bodyText = `📱 Cihaz: ${devType}\n🆔 Cihaz ID: ${devId}\n📍 Konum: ${locationStr}\n🕒 Saat: ${timeStr}`;
+    const msg = encodeURIComponent(bodyText);
     const publishUrl = `https://ntfy.sh/orbit-eats-baki-alert/publish?title=${title}&message=${msg}`;
 
     fetch(publishUrl, { method: "GET", mode: "no-cors" }).catch(() => {});
