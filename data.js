@@ -1377,6 +1377,111 @@ const RESTAURANTS = [
         "tags": ["doner", "durum", "cok-acili"]
       }
     ]
+  },
+  {
+    "id": "r30",
+    "name": "Sevgi Lokantası Ev Yemekleri",
+    "cuisine": "Ev Yemekleri",
+    "image": "assets/sevgi_lokantasi.jpg",
+    "rating": 4.0,
+    "deliveryMinutes": 15,
+    "distanceKm": 1.2,
+    "priceLevel": 2,
+    "tags": ["ev-yemegi", "kofte", "doyurucu"],
+    "menu": [
+      {
+        "id": "m59",
+        "name": "Kızartma İçli Köfte (Adet)",
+        "image": "assets/sevgi_lokantasi.jpg",
+        "price": 170,
+        "ingredients": ["kıyma", "ceviz", "bulgur", "baharat"],
+        "allergens": ["gluten"],
+        "calories": 310,
+        "prepMinutes": 6,
+        "tags": ["ev-yemegi", "kofte", "doyurucu"]
+      },
+      {
+        "id": "m60",
+        "name": "Kuru Fasulye & Pirinç Pilavı",
+        "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&auto=format&fit=crop&q=80",
+        "price": 220,
+        "ingredients": ["kuru fasulye", "tereyağı", "pirinç"],
+        "allergens": ["süt ürünleri"],
+        "calories": 490,
+        "prepMinutes": 7,
+        "tags": ["ev-yemegi", "acisiz"]
+      }
+    ]
+  },
+  {
+    "id": "r31",
+    "name": "Döner Keyf Sulu Yemek & Et Döner",
+    "cuisine": "Döner & Sulu Yemek",
+    "image": "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=500&auto=format&fit=crop&q=80",
+    "rating": 4.5,
+    "deliveryMinutes": 25,
+    "distanceKm": 2.1,
+    "priceLevel": 2,
+    "tags": ["doner", "et-doner", "sulu-yemek", "ev-yemegi"],
+    "menu": [
+      {
+        "id": "m61",
+        "name": "Tereyağlı İskender Döner",
+        "image": "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=500&auto=format&fit=crop&q=80",
+        "price": 380,
+        "ingredients": ["yaprak et döner", "pide", "tereyağı", "yoğurt", "domates sosu"],
+        "allergens": ["gluten", "süt ürünleri"],
+        "calories": 720,
+        "prepMinutes": 10,
+        "tags": ["doner", "et-doner", "doyurucu"]
+      },
+      {
+        "id": "m62",
+        "name": "Fırın Kuzu İncik & Tas Kebabı",
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&auto=format&fit=crop&q=80",
+        "price": 360,
+        "ingredients": ["kuzu eti", "patates", "arpa şehriye pilavı"],
+        "allergens": ["gluten"],
+        "calories": 610,
+        "prepMinutes": 12,
+        "tags": ["ev-yemegi", "sulu-yemek"]
+      }
+    ]
+  },
+  {
+    "id": "r32",
+    "name": "Hünkar Ev Yemekleri",
+    "cuisine": "Ev Yemekleri",
+    "image": "assets/hunkar_ev_yemekleri.jpg",
+    "rating": 2.0,
+    "deliveryMinutes": 18,
+    "distanceKm": 1.6,
+    "priceLevel": 2,
+    "tags": ["ev-yemegi", "sarma", "hafif", "vejetaryen-secenekli"],
+    "menu": [
+      {
+        "id": "m63",
+        "name": "Zeytinyağlı Yaprak Sarma (6 Adet)",
+        "image": "assets/hunkar_ev_yemekleri.jpg",
+        "price": 300,
+        "ingredients": ["asma yaprağı", "pirinç", "zeytinyağı", "baharat", "limon"],
+        "allergens": [],
+        "calories": 360,
+        "prepMinutes": 5,
+        "tags": ["ev-yemegi", "sarma", "hafif", "vejetaryen", "vegan"]
+      },
+      {
+        "id": "m64",
+        "name": "Hünkar Beğendi",
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&auto=format&fit=crop&q=80",
+        "price": 340,
+        "ingredients": ["patlıcan beğendi", "kuzu eti", "tereyağı"],
+        "allergens": ["süt ürünleri"],
+        "calories": 580,
+        "prepMinutes": 10,
+        "tags": ["ev-yemegi", "doyurucu"]
+      }
+    ]
   }
 ];
 
