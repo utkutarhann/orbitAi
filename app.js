@@ -2502,7 +2502,7 @@ function showEtaBreakdown() {
     if (!document.getElementById("etaBreakdownSlot") || !STATE.etaOpen) return;
     slot.innerHTML = `
       <div class="eta-breakdown">
-        <p class="ebd-title">Şu an neye bakıyorum</p>
+        <p class="ebd-title">Siparişin Detaylı Gecikme Nedenleri</p>
         ${currentSignals.map(s => `
           <div class="ebd-row ${s.level || ""}">
             <span class="ebd-ico">${s.icon}</span>
