@@ -1200,8 +1200,7 @@ function tierConditionsHTML(tier) {
           info: "Orbit Eats ve Orbit Mart içerisinde yaptığın toplam harcama tutarı",
           now: spend.totalAnyMethod, target: BASE_ACTIVITY_THRESHOLD,
           fmt: money, leftLabel: (n) => `${tl(n)} daha harcaman gerekiyor`, step: "2"
-        })
-      + `<p class="tier-note">Harcama eşiğinde <strong>tüm ödeme yöntemleri</strong> sayılır — kartla ödediğin siparişler de dahildir.</p>`;
+        });
   }
 
   if (tier === "Plus") {
