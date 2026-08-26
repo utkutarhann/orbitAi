@@ -2500,7 +2500,7 @@ function renderIssueChat() {
   if (STATE.issueChat.messages.length === 0) {
     STATE.issueChat.messages.push({
       role: "assistant",
-      text: "Merhaba, siparişinle ilgili ne oldu? Kısaca anlatabilir misin? İstersen bir fotoğraf da ekleyebilirsin."
+      text: "Merhaba, siparişinle ilgili bir sorun yaşadığını düşünüyorum. Sana nasıl yardımcı olabilirim?"
     });
   }
   root.innerHTML = `
