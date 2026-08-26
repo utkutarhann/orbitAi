@@ -4099,8 +4099,9 @@ body {
   /* tier-modal-content padding'ini (10px 18px) iptal edip kenarlara yasla */
   margin: 0 -18px 16px -18px;
   border-radius: 0 0 24px 24px !important;
-  padding: 44px 18px 20px;
-  background: transparent !important;
+  padding: 44px 18px 20px !important;
+  background: linear-gradient(145deg, #0b2253 0%, #18113c 55%, #20144d 100%) !important;
+  color: #ffffff !important;
 }
 .modal-close-btn.on-card {
   position: absolute;
@@ -5296,9 +5297,8 @@ body {
   height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
-  background: linear-gradient(160deg, #100b2e 0%, #161042 40%, #0b2253 100%) !important;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
+  background: #0b2253 !important;
+  border-radius: 0 !important;
 }
 .tier-modal-content:has(.prominent-loyalty-card.full-bleed) > .tier-modal-body {
   background: #ffffff;
