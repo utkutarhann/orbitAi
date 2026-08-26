@@ -2606,7 +2606,7 @@ function renderIssueChatMessages() {
   const escBtn = body.querySelector("[data-escalated-done]");
   if (escBtn) escBtn.addEventListener("click", renderLiveSupport);
   const doneBtn = body.querySelector("[data-done]");
-  if (doneBtn) doneBtn.addEventListener("click", renderTracking);
+  if (doneBtn) doneBtn.addEventListener("click", renderHome);
 }
 
 /* Canlı destek: prototipte statik bir temsilci görüşmesi (AI bağlı değil) */
@@ -2732,6 +2732,34 @@ function supportContext(extra) {
 }
 
 async function handleIssueChatMessage(text) {
+  // Kullanıcı ana sayfaya dönmek isterse
+  if (/ana\s*sayfa|anasayfa/i.test(text)) {
+    renderHome();
+    return;
+  }
+  // Kullanıcı siparişi tekrarlamak isterse (ürünleri sepete ekler ve sepetim ekranını açar)
+  if (/siparişi\s*tekrarla|siparişi\s*yenile|tekrarla/i.test(text)) {
+    const order = typeof activeOrder === "function" ? activeOrder() : null;
+    const itemsToReorder = (order && order.items) || [
+      { name: "Trüf Cheddarlı Burger Menu", price: 340, qty: 1 },
+      { name: "San Sebastian Cheesecake", price: 120, qty: 1 }
+    ];
+    itemsToReorder.forEach((item, idx) => {
+      const itemId = `reorder-${idx + 1}`;
+      addToCart({
+        itemId: itemId,
+        itemName: item.name,
+        price: item.price,
+        restaurantId: "r1",
+        restaurantName: (order && order.storeName) || "Focus Burger & Gurme Mutfak"
+      });
+      if (STATE.cart[itemId] && item.qty) {
+        STATE.cart[itemId].qty = item.qty;
+      }
+    });
+    renderCheckout();
+    return;
+  }
   // Kullanıcı doğrudan insana bağlanmak isterse AI'ı devreden çıkar
   if (/destek ekibine aktar|temsilciy?e? bağla|canlı destek/i.test(text)) {
     renderLiveSupport();
