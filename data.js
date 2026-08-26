@@ -1672,7 +1672,7 @@ const USER = {
     "martAccountOpen": true,
     "martOrders90d": 6,
     "standingOrders": 0,
-    "accountCreatedAt": "2025-12-20",
+    "accountCreatedAt": "2025-01-01",
     "currentMonth": "Ağustos 2026",
     "daysLeftInMonth": 13,
     "cashbackEarned90d": 270.0,

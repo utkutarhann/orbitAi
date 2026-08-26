@@ -1174,7 +1174,7 @@ function tierConditionsHTML(tier) {
           <div class="cond-bar-wrap" data-tip="${done ? "Tamamlandı" : opts.leftLabel(left)}">
             <div class="cond-prog-bar"><div class="cond-prog-fill ${done ? "done" : ""}" style="width:${pct}%"></div></div>
             <div class="cond-bar-scale">
-              <span class="cbs-now">${opts.fmt(opts.now)}</span>
+              <span class="cbs-now">${opts.fmt(Math.min(opts.now, opts.target))}</span>
               <span class="cbs-target">${opts.fmt(opts.target)}</span>
             </div>
           </div>
