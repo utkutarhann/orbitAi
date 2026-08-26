@@ -2435,9 +2435,8 @@ function orderCashbackTRY() {
   return getCheckoutCashback(method, o.totalTRY || 0, o.vertical || "eats", o.tierAtOrder || currentTier()).amount;
 }
 
-/* Gecikme telafisi: nakit iadeye dokunmadan, sonraki siparişte geçerli
-   indirim kuponu tanımlanır. Kullanıcıdan bir aksiyon beklenmez. */
-const DELAY_COUPON_TRY = 100;
+/* Gecikme telafisi tek yerden gelir: DELAY_COUPON_TRY engine.js'te tanımlı,
+   resolveIssue() de aynı sabiti kullanıyor. İki kanal tek cevap veriyor. */
 function delayCompensationTRY() {
   return DELAY_COUPON_TRY;
 }
@@ -2672,7 +2671,6 @@ function renderLiveSupport() {
   document.getElementById("lsSend").addEventListener("click", send);
   document.getElementById("lsInput").addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
 
-  // Bağlanma ve karşılama akışı
   chatTimers.push(setTimeout(() => {
     const st = document.getElementById("lsStatus");
     const nm = document.getElementById("lsAgentName");
@@ -2744,8 +2742,21 @@ async function handleIssueChatMessage(text) {
   STATE.issueChat.messages.push(typingMsg);
   renderIssueChatMessages();
 
-  // Geç teslimat bir ürün sorunu değil: fotoğraf istenmez, iade önerilmez
   const tip = classifyIssue(text);
+  STATE.issueChat.issueType = tip;
+
+  // Eğer kullanıcı önceden fotoğraf atıp sorunu şimdi açıkladıysa, bekleyen fotoğrafı değerlendir
+  if (STATE.issueChat.pendingPhoto) {
+    const pending = STATE.issueChat.pendingPhoto;
+    STATE.issueChat.pendingPhoto = null;
+    const i = STATE.issueChat.messages.indexOf(typingMsg);
+    if (i > -1) STATE.issueChat.messages.splice(i, 1);
+
+    await evaluatePhotoEvidenceWithIssue(pending, tip);
+    return;
+  }
+
+  // Geç teslimat bir ürün sorunu değil: fotoğraf istenmez, iade önerilmez
   const ai = await callGeminiSupport(text, supportContext(
     tip === "geç teslimat" ? { mode: "late_delivery" } : null
   ));
@@ -2815,10 +2826,6 @@ function shrinkImage(file, maxEdge) {
 }
 
 async function processIssuePhoto(file) {
-  const issueType = STATE.issueChat.issueType || "sipariş sorunu";
-  const order = typeof activeOrder === "function" ? activeOrder() : null;
-  const orderTotal = (order && order.totalTRY) || STATE.orderTotal || 165;
-
   const shrunk = await shrinkImage(file, 512);
   STATE.issueChat.messages.push({
     role: "user",
@@ -2826,6 +2833,32 @@ async function processIssuePhoto(file) {
     photo: true,
     src: shrunk ? shrunk.dataUrl : null
   });
+
+  const issueType = STATE.issueChat.issueType;
+
+  // Kullanıcı henüz sorunun ne olduğunu belirtmediyse (direkt fotoğraf attıysa):
+  if (!issueType || issueType === "sipariş sorunu") {
+    STATE.issueChat.pendingPhoto = shrunk;
+    STATE.issueChat.messages.push({
+      role: "assistant",
+      text: "Fotoğrafı aldım, teşekkürler! Siparişinde tam olarak nasıl bir sorun yaşadın? Kısaca anlatabilir misin?",
+      checks: [
+        { label: "Görüntü alındı", detail: "Fotoğraf sisteme yüklendi", ok: true },
+        { label: "Talep nedeni", detail: "Kullanıcıdan detay bekleniyor", ok: false }
+      ]
+    });
+    setIssueQuickChips(["Siparişim eksik geldi", "Yanlış ürün geldi", "Paket/Ürün hasarlı"]);
+    renderIssueChatMessages();
+    return;
+  }
+
+  // Sorun türü biliniyorsa fotoğrafı doğrudan o sorun çerçevesinde değerlendir
+  await evaluatePhotoEvidenceWithIssue(shrunk, issueType);
+}
+
+async function evaluatePhotoEvidenceWithIssue(shrunk, issueType) {
+  const order = typeof activeOrder === "function" ? activeOrder() : null;
+  const orderTotal = (order && order.totalTRY) || STATE.orderTotal || 165;
 
   const stepMsg = { role: "steps", lines: [], done: false };
   STATE.issueChat.messages.push(stepMsg);
@@ -2846,7 +2879,6 @@ async function processIssuePhoto(file) {
   const vision = shrunk ? await analyzePhotoEvidence(shrunk.base64, shrunk.mimeType, order) : null;
   const karar = decidePhotoClaim(vision, order, issueType);
 
-  const kalan = Math.max(0, 260 + lines.length * 460 + 320 - 0);
   setTimeout(async () => {
     stepMsg.done = true;
 
@@ -2857,7 +2889,7 @@ async function processIssuePhoto(file) {
               `Değerlendirmeyi yapabilmem için yemeğin ya da paketin fotoğrafını paylaşır mısın? ` +
               `İstersen konuyu doğrudan destek ekibimize de aktarabilirim.`,
         checks: [
-          { label: "Görsel içeriği", detail: (vision && vision.description) || "Siparişe ait içerik bulunamadı", ok: false },
+          { label: "Görüntü içeriği", detail: (vision && vision.description) || "Siparişe ait içerik bulunamadı", ok: false },
           { label: "Sipariş eşleşmesi", detail: "Görsel sipariş içeriğiyle ilişkilendirilemedi", ok: false }
         ]
       });
@@ -2921,11 +2953,15 @@ async function processIssuePhoto(file) {
                 : `Eksik ürün karşılığı · ${tl(karar.refundAmount)}`,
             ok: true }
         ],
-        resolution: { ...karar, settled: false }
+        resolution: {
+          refundAmount: karar.refundAmount,
+          settled: false
+        }
       });
+      setIssueQuickChips(["Temsilciye bağlan", "Siparişi tekrarla"]);
     }
     renderIssueChatMessages();
-  }, kalan);
+  }, 260 + lines.length * 460 + 260);
 }
 
 function approveIssueRefund() {

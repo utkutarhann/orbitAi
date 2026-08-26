@@ -882,12 +882,15 @@ function resolveIssue(issueType, order, issueItemName) {
   const kalemler = o.items || [];
   const tavan = Math.round(orderTotal * MAX_REFUND_RATIO * 100) / 100;
 
+  /* Geç teslimat bir ürün sorunu değil: nakit iade teklif edilmez, fotoğraf
+     istenmez. Telafi, gecikme algılandığı anda otomatik tanımlanan indirim
+     kuponudur — hangi kanaldan gelinirse gelinsin tek ve aynı cevap. */
   if (issueType === "geç teslimat") {
     return {
-      outcome: "auto_refund",
-      issueType, basis: "delivery_fee", itemName: null, orderTotal,
-      refundAmount: STANDARD_DELIVERY_FEE,
-      explanation: `Siparişin geciktiği için ${tl(STANDARD_DELIVERY_FEE)} teslimat ücretini iade edebilirim.`
+      outcome: "delay_coupon",
+      issueType, basis: "delay_coupon", itemName: null, orderTotal,
+      refundAmount: 0, couponTRY: DELAY_COUPON_TRY,
+      explanation: `Gecikme için nakit iade yerine bir sonraki siparişinde kullanabileceğin ${tl(DELAY_COUPON_TRY)}'lik indirim kuponu hesabına tanımlandı.`
     };
   }
 
@@ -1130,6 +1133,9 @@ const AUTO_REFUND_ORDER_CAP_TRY = 1000;
 /* İade hiçbir durumda sipariş tutarının %80'ini aşmaz.
    Ürün ayırt edilemediğinde %40 iade silindi — dosya insan temsilciye aktarılır. */
 const MAX_REFUND_RATIO = 0.8;
+/* Gecikme telafisi: nakit iadeye dokunulmaz, sonraki siparişte geçerli kupon
+   tanımlanır. Kullanıcıdan onay ya da aksiyon beklenmez. */
+const DELAY_COUPON_TRY = 100;
 
 function decidePhotoClaim(vision, order, issueType) {
   const orderTotal = (order && order.totalTRY) || 0;

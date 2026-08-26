@@ -1217,12 +1217,15 @@ const USER = {
     "dislikes": ["acı"],
     "notes": "Akşamları hafif, öğle araları doyurucu tercih eder."
   },
+  /* priceTRY = o siparişin toplam sepet tutarı (ana ürün + yan ürün/içecek).
+     Ortalaması 500 TL'lik AOV çıpasıyla birebir tutarlı olmalı — hem ekrandaki
+     sipariş geçmişi hem de AI'a giden "alıştığı bütçe" bloğu buradan besleniyor. */
   "orderHistory": [
-    { "restaurant": "Yeşil Kase", "item": "Quinoa & Avokado Kase", "priceTRY": 165, "dayPart": "akşam", "daysAgo": 2 },
-    { "restaurant": "Zeytin Sofrası", "item": "Mercimek Köftesi Tabağı", "priceTRY": 120, "dayPart": "akşam", "daysAgo": 5 },
-    { "restaurant": "Dürüm Ustası", "item": "Falafel Dürüm (Vegan)", "priceTRY": 110, "dayPart": "öğle", "daysAgo": 6 },
-    { "restaurant": "Yeşil Kase", "item": "Izgara Somon Kase", "priceTRY": 420, "dayPart": "akşam", "daysAgo": 9 },
-    { "restaurant": "Zeytin Sofrası", "item": "Zeytinyağlı Taze Fasulye", "priceTRY": 145, "dayPart": "akşam", "daysAgo": 12 }
+    { "restaurant": "Yeşil Kase", "item": "Quinoa & Avokado Kase", "priceTRY": 480, "dayPart": "akşam", "daysAgo": 2 },
+    { "restaurant": "Zeytin Sofrası", "item": "Mercimek Köftesi Tabağı", "priceTRY": 520, "dayPart": "akşam", "daysAgo": 5 },
+    { "restaurant": "Dürüm Ustası", "item": "Falafel Dürüm (Vegan)", "priceTRY": 430, "dayPart": "öğle", "daysAgo": 6 },
+    { "restaurant": "Yeşil Kase", "item": "Izgara Somon Kase", "priceTRY": 610, "dayPart": "akşam", "daysAgo": 9 },
+    { "restaurant": "Zeytin Sofrası", "item": "Zeytinyağlı Taze Fasulye", "priceTRY": 465, "dayPart": "akşam", "daysAgo": 12 }
   ],
   "popularNearbyFallback": [
     { "restaurant": "Zeytin Sofrası", "item": "Mercimek Köftesi Tabağı", "reason": "Bölgede son 7 günün en çok sipariş edileni" },
