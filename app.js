@@ -1385,15 +1385,9 @@ function renderPreferences() {
             </div>
 
             <div class="tier-tabs-row">
-              ${["Base", "Plus", "Prime"].map(t => {
-                const isCurrent = t === tb.tier;
-                return `
-                  <div class="tier-tab-wrapper ${isCurrent ? "is-current-wrapper" : ""}">
-                    ${isCurrent ? '<span class="current-tier-badge">✓ MEVCUT PLAN</span>' : ""}
-                    <button class="tier-tab-pill ${isCurrent ? "active is-current" : ""}" data-tier="${t.toLowerCase()}">${t === "Base" ? "" : "✦ "}${t}${isCurrent ? " ✓" : ""}</button>
-                  </div>
-                `;
-              }).join("")}
+              ${["Base", "Plus", "Prime"].map(t => `
+                <button class="tier-tab-pill ${t === tb.tier ? "active is-current" : ""}" data-tier="${t.toLowerCase()}">${t === "Base" ? "" : "✦ "}${t}</button>
+              `).join("")}
             </div>
 
             <div class="tier-section-block">
