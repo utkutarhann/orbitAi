@@ -2259,10 +2259,10 @@ function initDelivery() {
   const rest = STATE.activeRestaurant || (ao ? { name: ao.storeName } : null) || { name: "Yeşil Kase" };
 
   const signals = [
-    { id: "courier", icon: "🛵", label: "Kurye konumu", detail: "2.1 km uzaklıkta", delta: 4, base: true },
-    { id: "traffic", icon: "🚦", label: "Trafik · Barbaros Bulvarı", detail: "yoğun", delta: 5, level: "high" },
+    { id: "courier", icon: "🛵", label: "Kurye konumu", detail: "2.1 km uzaklıkta", delta: 12, base: true },
+    { id: "traffic", icon: "🚦", label: "Trafik Yoğunluğu", detail: "yoğun", delta: 5, level: "high" },
     { id: "kitchen", icon: "🍳", label: `Mutfak yoğunluğu · ${rest.name}`, detail: "normal", delta: 0, level: "ok" },
-    { id: "weather", icon: "🌧️", label: "Hava durumu", detail: rainy ? "yağmurlu" : "açık", delta: rainy ? 2 : 0, level: rainy ? "warn" : "ok" }
+    { id: "weather", icon: "🌧️", label: "Hava Koşulları", detail: rainy ? "yağmurlu" : "açık", delta: rainy ? 2 : 0, level: rainy ? "warn" : "ok" }
   ];
 
   const etaMin = signals.reduce((s, x) => s + x.delta, 0);
@@ -2320,7 +2320,7 @@ function renderTracking() {
         </div>
         ${d.delayMin >= 5 ? `
           <div class="eta-delay-strip">
-            <p class="eds-reason">${d.signals.find(s => s.id === "traffic").label.split("·")[1].trim()} yoğun ve yağmur var — kurye yolda, takipteyim.</p>
+            <p class="eds-reason">Güzergâhtaki trafik ve hava koşulları nedeniyle gecikme yaşanıyor — kurye yolda, takipteyim.</p>
             <div class="eds-comp">
               <p class="edsc-note">
                 Yaşanan gecikme için özür dileriz. Hesabına, bir sonraki siparişinde
@@ -2365,7 +2365,7 @@ function renderTracking() {
 
       <button class="ask-courier-btn" id="askCourierBtn" aria-expanded="false" aria-controls="etaBreakdownSlot">
         <span class="acb-spark">✦</span>
-        <span>Kuryem nerede?</span>
+        <span>Siparişim neden gecikti?</span>
         <span class="acb-go">›</span>
       </button>
       <div id="etaBreakdownSlot"></div>
@@ -2448,6 +2448,9 @@ function showEtaBreakdown() {
   const slot = document.getElementById("etaBreakdownSlot");
   if (!slot) return;
   const d = initDelivery();
+  const rem = remainingMin();
+  const baseDelta = Math.max(1, rem - d.delayMin);
+  const currentSignals = d.signals.map(s => s.base ? { ...s, delta: baseDelta } : s);
 
   slot.innerHTML = `<div class="ai-steps" id="etaSteps"></div>`;
   const stepsEl = document.getElementById("etaSteps");
@@ -2468,7 +2471,7 @@ function showEtaBreakdown() {
     slot.innerHTML = `
       <div class="eta-breakdown">
         <p class="ebd-title">Şu an neye bakıyorum</p>
-        ${d.signals.map(s => `
+        ${currentSignals.map(s => `
           <div class="ebd-row ${s.level || ""}">
             <span class="ebd-ico">${s.icon}</span>
             <span class="ebd-label">${s.label}<em>${s.detail}</em></span>
@@ -2479,9 +2482,9 @@ function showEtaBreakdown() {
         `).join("")}
         <div class="ebd-total">
           <span>Tahmini teslim</span>
-          <strong>${deliveryClock()} · ${remainingMin()} dk</strong>
+          <strong>${deliveryClock()} · ${rem} dk</strong>
         </div>
-        <p class="ebd-note">Kurye ${d.signals.find(s => s.id === "traffic").detail} trafik nedeniyle ${d.delayMin} dakika gecikiyor.</p>
+        <p class="ebd-note">Güzergâhtaki yoğunluk ve hava koşulları nedeniyle siparişinde ${d.delayMin} dakika gecikme yaşanıyor.</p>
       </div>
     `;
   }, 200 + lines.length * 420 + 260);
