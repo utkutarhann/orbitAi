@@ -1235,6 +1235,89 @@ body {
   border-radius: 10px;
 }
 
+/* Live Order Details Card inside Orbit AI Chat */
+.chat-live-order-card {
+  background: var(--orbit-surface);
+  border: 1.5px solid var(--orbit-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin: 10px 0;
+  box-shadow: 0 4px 14px rgba(108, 76, 240, 0.07);
+  animation: stepIn 0.3s ease;
+}
+.cloc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid var(--orbit-border);
+}
+.cloc-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cloc-icon {
+  font-size: 24px;
+}
+.cloc-title strong {
+  display: block;
+  font-size: 14px;
+  color: var(--orbit-ink);
+  font-weight: 800;
+}
+.cloc-status-pill {
+  font-size: 11.5px;
+  color: var(--orbit-primary-dark);
+  font-weight: 700;
+  margin-top: 2px;
+}
+.cloc-details {
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cloc-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+.cloc-label {
+  color: var(--orbit-muted);
+  font-weight: 600;
+}
+.cloc-val {
+  color: var(--orbit-ink);
+  font-weight: 600;
+  text-align: right;
+  max-width: 62%;
+}
+.cloc-val.text-warn {
+  color: var(--orbit-amber-dark);
+}
+.cloc-val.text-ok {
+  color: #10b981;
+}
+.cloc-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px;
+  background: linear-gradient(135deg, #6c4cf0, #4c2cf0);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(108, 76, 240, 0.25);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.cloc-btn:active {
+  transform: scale(0.98);
+}
+
 /* ---------- Prime şartları: rakamlar metinde değil, bar'ın üstünde ---------- */
 .cond-sub strong { color: var(--orbit-ink); font-weight: 800; }
 

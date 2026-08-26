@@ -3396,6 +3396,53 @@ function renderChatMessages() {
           <button class="mb-btn" data-mart-go="1">Malzemeleri Orbit Mart'ta hazırla</button>
         </div>`;
     }
+    if (m.orderCard) {
+      const o = (typeof activeOrder === "function" ? activeOrder() : null) || {
+        storeName: "Yeşil Kase",
+        itemsSummary: "Avokado Roka Bowl (2x), Taze Sıkma Portakal Suyu",
+        totalTRY: 380,
+        deliveryAddress: "Levent Mah. Konut Sok. No:4 D:8"
+      };
+      const d = (typeof initDelivery === "function" ? initDelivery() : { delayMin: 5 });
+      const rem = (typeof remainingMin === "function" ? remainingMin() : 15);
+      const clock = (typeof deliveryClock === "function" ? deliveryClock() : "21:40");
+
+      html += `
+        <div class="chat-live-order-card">
+          <div class="cloc-header">
+            <div class="cloc-title">
+              <span class="cloc-icon">🛵</span>
+              <div>
+                <strong>${o.storeName || "Yeşil Kase"}</strong>
+                <p class="cloc-status-pill">Siparişin Yolda · Tahmini ${rem} dk (${clock})</p>
+              </div>
+            </div>
+          </div>
+          <div class="cloc-details">
+            <div class="cloc-detail-row">
+              <span class="cloc-label">📦 Sipariş İçeriği</span>
+              <span class="cloc-val">${o.itemsSummary || "Taze Menü Siparişi"}</span>
+            </div>
+            <div class="cloc-detail-row">
+              <span class="cloc-label">📍 Teslimat Adresi</span>
+              <span class="cloc-val">${o.deliveryAddress || "Levent Mah. Konut Sok. No:4"}</span>
+            </div>
+            <div class="cloc-detail-row">
+              <span class="cloc-label">💳 Toplam Tutar</span>
+              <span class="cloc-val"><strong>${o.totalTRY || 380} TL</strong></span>
+            </div>
+            <div class="cloc-detail-row">
+              <span class="cloc-label">🚦 Yol & Trafik Durumu</span>
+              <span class="cloc-val ${d.delayMin > 0 ? "text-warn" : "text-ok"}">
+                ${d.delayMin > 0 ? `Yoğunluk nedeniyle +${d.delayMin} dk gecikme` : "Normal seyrediyor"}
+              </span>
+            </div>
+          </div>
+          <button class="cloc-btn" data-action="track" data-id="${o.id || "active"}">🚀 Canlı Sipariş Haritası & Detayı</button>
+        </div>
+      `;
+    }
+
     if (m.followups && m.followups.length) {
       html += `<div class="ai-followups">
         ${m.followups.map(f => `<button class="ai-followup-chip" data-followup="${f}">${f}</button>`).join("")}
@@ -3439,6 +3486,9 @@ function renderChatMessages() {
       if (STATE.chatGenerating) return;
       handleChatMessage(btn.dataset.followup);
     });
+  });
+  document.querySelectorAll(".cloc-btn").forEach(btn => {
+    btn.addEventListener("click", () => renderTracking());
   });
   // Mart köprüsü: mevcut A2A devir teslim ekranıyla dikeyler arası geçiş
   document.querySelectorAll("[data-mart-go]").forEach(btn => {
@@ -3538,6 +3588,35 @@ async function handleChatMessage(text, opts) {
   STATE.chatMessages.push(typingMsg);
   setChatGenerating(true);
   renderChatMessages();
+
+  // 1. Müşteri hizmetleri / temsilci talebi (Görsel 1):
+  if (/müşteri (hizmetleri|temsilcisi)|temsilci|canlı destek|bağlan/i.test(text)) {
+    const i = STATE.chatMessages.indexOf(typingMsg);
+    if (i > -1) STATE.chatMessages.splice(i, 1);
+    STATE.chatMessages.push({
+      role: "assistant",
+      text: "Sana yardım etmek için buradayım, yaşadığın deneyimi anlatır mısın?",
+      followups: ["İptal etmek istiyorum", "Sipariş nerede"]
+    });
+    renderChatMessages();
+    setChatGenerating(false);
+    return;
+  }
+
+  // 2. Sipariş nerede / canlı durum talebi (Görsel 2):
+  if (/sipariş.*nerede|siparis.*nerede|sipariş.*durum|kurye.*nerede/i.test(text)) {
+    const i = STATE.chatMessages.indexOf(typingMsg);
+    if (i > -1) STATE.chatMessages.splice(i, 1);
+    STATE.chatMessages.push({
+      role: "assistant",
+      text: "Siparişin yolda! En kısa sürede sana ulaştırılacaktır. Canlı sipariş detaylarını ve tahmini teslimat durumunu aşağıda senin için hazırladım:",
+      orderCard: true,
+      followups: ["Tahmini süre nedir?", "Kuryeyi arayabilir misin?"]
+    });
+    renderChatMessages();
+    setChatGenerating(false);
+    return;
+  }
 
   try {
     // Gemini API veya Yerel Fallback

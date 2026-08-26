@@ -414,6 +414,34 @@ function fallbackLocalAi(query) {
   const ctx = getLiveScenarioContext();
 
   if (!looksLikeFoodRequest(query)) {
+    if (/temsilci|müşteri (hizmetleri|temsilcisi)|canlı destek|bağlan/i.test(query)) {
+      return {
+        isRealAi: false,
+        intent: "chitchat",
+        thinkingSteps: [],
+        companionMessage: "Sana yardım etmek için buradayım, yaşadığın deneyimi anlatır mısın?",
+        results: [],
+        martHandoff: null,
+        followups: ["İptal etmek istiyorum", "Sipariş nerede"]
+      };
+    }
+
+    if (/sipariş.*nerede|siparis.*nerede|sipariş.*durum|kurye.*nerede/i.test(query)) {
+      return {
+        isRealAi: false,
+        intent: "food",
+        thinkingSteps: [
+          "Canlı kurye GPS konumu ve sipariş durumu sorgulanıyor.",
+          "Restoran hazırlık süresi ile güzergâh trafiği birleştiriliyor…"
+        ],
+        companionMessage: "Siparişin yolda! En kısa sürede sana ulaştırılacaktır. Canlı sipariş detaylarını ve tahmini teslimat durumunu aşağıda senin için hazırladım:",
+        results: [],
+        orderCard: true,
+        martHandoff: null,
+        followups: ["Tahmini süre nedir?", "Kuryeyi arayabilir misin?"]
+      };
+    }
+
     let msg = "";
     if (ctx.segment === "sabah") {
       msg = `Günaydın Baki! ☀️ Harikayım, teşekkürler! Güne enerjik başlaman için taze ve lezzetli kahvaltılıklar bulmak üzere buradayım. Canın bu sabah ne çekiyor, birlikte bakalım mı?`;
