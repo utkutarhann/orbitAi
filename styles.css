@@ -3313,15 +3313,17 @@ body {
 }
 .benefit-icon {
   font-size: 18px;
-  width: 40px;
-  height: 40px;
-  background: #e6f7f2;
-  color: #059669;
+  width: 42px;
+  height: 42px;
+  background: #d1fae5;
+  color: #047857;
+  border: 1.5px solid #a7f3d0;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.12);
 }
 .benefit-text strong {
   display: block;

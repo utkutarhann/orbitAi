@@ -206,6 +206,78 @@ const RESTAURANTS = [
     ]
   },
   {
+    "id": "r32",
+    "name": "Milano Pizza & Aliby",
+    "cuisine": "Salata & Pizza",
+    "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&auto=format&fit=crop&q=80",
+    "rating": 4.2,
+    "deliveryMinutes": 20,
+    "distanceKm": 1.2,
+    "priceLevel": 3,
+    "tags": ["salata", "bowl", "pizza", "vejetaryen-secenekli", "hafif"],
+    "menu": [
+      {
+        "id": "m56",
+        "name": "Ton Balıklı Salata",
+        "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&auto=format&fit=crop&q=80",
+        "price": 400.80,
+        "ingredients": ["marul", "ton balığı", "salatalık", "domates", "siyah zeytin", "turşu"],
+        "allergens": ["kabuklu deniz ürünleri"],
+        "calories": 380,
+        "prepMinutes": 7,
+        "tags": ["salata", "hafif", "protein", "pesketaryen"]
+      }
+    ]
+  },
+  {
+    "id": "r33",
+    "name": "Macarina Bowl & Salad",
+    "cuisine": "Salata & Bowl",
+    "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=80",
+    "rating": 4.4,
+    "deliveryMinutes": 15,
+    "distanceKm": 0.8,
+    "priceLevel": 2,
+    "tags": ["salata", "bowl", "vejetaryen-secenekli", "hafif"],
+    "menu": [
+      {
+        "id": "m57",
+        "name": "Roka Salata",
+        "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=80",
+        "price": 399.50,
+        "ingredients": ["taze roka", "ceviz", "domates", "tulum peyniri", "elma", "zeytin"],
+        "allergens": ["süt ürünleri"],
+        "calories": 310,
+        "prepMinutes": 5,
+        "tags": ["salata", "hafif", "vejetaryen", "vegan"]
+      }
+    ]
+  },
+  {
+    "id": "r34",
+    "name": "Go Green Bowl",
+    "cuisine": "Dünya Mutfakları & Salata",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80",
+    "rating": 4.3,
+    "deliveryMinutes": 18,
+    "distanceKm": 1.1,
+    "priceLevel": 2,
+    "tags": ["salata", "bowl", "vejetaryen-secenekli", "hafif"],
+    "menu": [
+      {
+        "id": "m58",
+        "name": "Ton Balıklı Salata",
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80",
+        "price": 519.95,
+        "ingredients": ["akdeniz yeşillikleri", "ton balığı", "mısır", "çeri domates", "salatalık"],
+        "allergens": ["kabuklu deniz ürünleri"],
+        "calories": 410,
+        "prepMinutes": 8,
+        "tags": ["salata", "hafif", "protein", "pesketaryen"]
+      }
+    ]
+  },
+  {
     "id": "r6",
     "name": "Focus Burger & Gurme Mutfak",
     "cuisine": "Hamburger & Western",

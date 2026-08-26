@@ -889,15 +889,37 @@ function renderHome() {
       if (cat === "tumu") {
         renderHome();
       } else {
-        const catMap = {
-          "hamburger": "Burger", "pizza": "Pizza", "et": "Fusion",
-          "tavuk": "Mutfak", "salata": "Sağlıklı", "tatli": "Tatlı", "uzakdogu": "Uzak Doğu"
-        };
-        const filterKeyword = catMap[cat] || cat;
-        const filteredList = STATE.restaurants.filter(r => 
-          r.cuisine.toLowerCase().includes(filterKeyword.toLowerCase()) || 
-          (r.tags && r.tags.some(t => t.toLowerCase().includes(filterKeyword.toLowerCase())))
-        );
+        const filteredList = STATE.restaurants.filter(r => {
+          const c = (r.cuisine || "").toLowerCase();
+          const tags = (r.tags || []).map(t => t.toLowerCase());
+          const menuTags = (r.menu || []).flatMap(m => (m.tags || []).map(t => t.toLowerCase()));
+          const menuNames = (r.menu || []).map(m => (m.name || "").toLowerCase());
+          
+          if (cat === "salata") {
+            return c.includes("salata") || c.includes("bowl") || c.includes("sağlıklı") ||
+                   tags.includes("salata") || tags.includes("bowl") || menuTags.includes("salata") ||
+                   menuNames.some(n => n.includes("salata") || n.includes("bowl"));
+          }
+          if (cat === "hamburger") {
+            return c.includes("burger") || tags.includes("burger") || menuTags.includes("burger") || menuNames.some(n => n.includes("burger"));
+          }
+          if (cat === "pizza") {
+            return c.includes("pizza") || tags.includes("pizza") || menuTags.includes("pizza") || menuNames.some(n => n.includes("pizza"));
+          }
+          if (cat === "et") {
+            return c.includes("et") || c.includes("kebap") || c.includes("köfte") || c.includes("dürüm") || tags.includes("et") || tags.includes("kebap");
+          }
+          if (cat === "tavuk") {
+            return c.includes("tavuk") || tags.includes("tavuk") || menuNames.some(n => n.includes("tavuk"));
+          }
+          if (cat === "tatli") {
+            return c.includes("tatlı") || c.includes("tatli") || c.includes("fırın") || tags.includes("tatli") || tags.includes("tatlı");
+          }
+          if (cat === "uzakdogu") {
+            return c.includes("uzak doğu") || c.includes("fusion") || c.includes("sushi") || tags.includes("sushi") || tags.includes("uzakdogu");
+          }
+          return c.includes(cat) || tags.some(t => t.includes(cat));
+        });
         const targetList = filteredList.length > 0 ? filteredList : STATE.restaurants.slice(0, 4);
         
         const restSection = document.querySelector(".screen");
