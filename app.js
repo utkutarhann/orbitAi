@@ -1250,7 +1250,7 @@ function tierBenefitsHTML(tier) {
 
   /* Base'de teslimat ücreti bir avantaj değil, standart koşuldur — listelenmez */
   const delivery = tier === "Prime"
-    ? item("👑", "Her zaman ücretsiz teslimat", "Orbit Eats ve Orbit Mart'taki tüm siparişlerinde 0 TL teslimat.")
+    ? item("👑", "Her zaman ücretsiz teslimat", "Orbit Eats ve Orbit Mart'taki tüm siparişlerinde ücretsiz teslimat.")
     : tier === "Plus"
       ? item("🍔", `${tl(PLUS_FREE_DELIVERY_MIN)} üzeri ücretsiz teslimat`, `Orbit Eats ve Orbit Mart'taki ${tl(PLUS_FREE_DELIVERY_MIN)} ve üzeri tüm siparişlerinde teslimat ücretsiz.`)
       : "";
