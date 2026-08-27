@@ -720,10 +720,9 @@ function getDeliveryFee(orderTotal, vertical, selectedMethod, tier) {
     return { fee: 0, free: true, reason: `Plus · ${PLUS_FREE_DELIVERY_MIN} TL üzeri Orbit Pay ödemesi` };
   }
   if (tier === "Plus" && withPay && v === "eats") {
-    const left = PLUS_FREE_DELIVERY_MIN - total;
     return {
       fee: STANDARD_DELIVERY_FEE, free: false,
-      hint: `${left.toLocaleString("tr-TR")} TL daha ekle, teslimat ücretsiz olsun`
+      hint: `${PLUS_FREE_DELIVERY_MIN} TL üzeri ücretsiz teslimat!`
     };
   }
   if (tier === "Plus" && !withPay) {
