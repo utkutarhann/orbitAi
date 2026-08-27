@@ -1369,37 +1369,42 @@ async function photoSearchWithGemini(base64, mimeType) {
 
   const user = (typeof STATE !== "undefined" && STATE && STATE.user) ? STATE.user : (typeof USER !== "undefined" ? USER : {});
   const prefs = user.declaredPreferences || {};
-  const catalog = shortlistForLlm("", buildMenuCatalog(), 16);
+  const allCatalog = buildMenuCatalog();
+  const catalog = (prefs.dietFilterActive === false)
+    ? allCatalog
+    : allCatalog.filter(passesProfileDiet);
+
   const menuListesi = catalog.map(i =>
-    `${i.itemId}|${i.itemName}|${i.restaurantName}|${i.price}TL|${(i.tags || []).join(",")}`
+    `${i.itemId}|${i.itemName}|${i.restaurantName}|${i.price}TL|${(i.tags || []).join(",")}|${(i.ingredients || []).slice(0, 5).join(",")}`
   ).join("\n");
 
-  const prompt = `Kullanıcı bir yemek fotoğrafı yükledi. Fotoğraftaki yemeği tanı ve
-menüden ona en yakın 3 seçeneği öner.
+  const prompt = `Kullanıcı bir yemek/yiyecek fotoğrafı veya menü ekran görüntüsü yükledi.
 
-KULLANICI TERCİHLERİ
+GÖREV:
+1. Görseldeki tüm yiyecek ve içecek unsurlarını (ekmek/hamur türü, ana malzeme, pişirme şekli, garnitür, patates kızartması, yumurta, peynir, sebze vb.) görsel olarak detaylıca analiz et ve çıkarım yap.
+2. Görseldeki lezzet profiline, ana bileşenlere veya eşdeğer lezzet kombinasyonlarına göre aşağıdaki MENÜ KATALOĞU içinden en uygun 3-4 seçeneği belirle.
+3. Ezbere veya sadece başlık metnine takılma; fotoğraftaki gerçek yiyeceklerin ne olduğuna ve lezzet profiline göre menümüzdeki karşılıklarını bul (örneğin fotoğrafta burger/sandviç ve patates varsa menüdeki burger, sandviç ve çıtır atıştırmalık/patates alternatiflerini seç).
+
+KULLANICI TERCİHLERİ:
 ${prefs.dietFilterActive === false
-  ? "Beslenme tercihi süzmesi KAPALI — diyet ve damak tadı kısıtı uygulama, menünün tamamından seç."
+  ? "Beslenme tercihi süzmesi KAPALI — menünün tamamından seçebilirsin."
   : `Diyet: ${prefs.dietStyle || "yok"} · Sevmedikleri: ${(prefs.dislikes || []).join(", ") || "yok"}`}
-Kaçındığı alerjenler (her koşulda uygula): ${(prefs.allergensToAvoid || []).join(", ") || "yok"}
+Kaçındığı alerjenler (kesinlikle uygula): ${(prefs.allergensToAvoid || []).join(", ") || "yok"}
 
-MENÜ (id|ürün|restoran|fiyat|etiketler)
+MENÜ KATALOĞU (id|ürün|restoran|fiyat|etiketler|içindekiler):
 ${menuListesi}
 
-Yalnızca şu JSON'u döndür:
+Yalnızca şu JSON formatında yanıt ver:
 {
-  "isFood": true/false,
-  "dishName": "fotoğraftaki yemeğin adı",
-  "note": "en fazla 8 kelime",
-  "recommendedItemIds": ["id1","id2","id3"],
-  "companionMessage": "1-2 cümle, sıcak bir dille neden bunları seçtiğin",
-  "followups": ["kısa öneri", "kısa öneri"]
+  "isFood": true,
+  "dishName": "Fotoğrafta görülen lezzetin açıklayıcı görsel tanımı (Örn: Yumurtalı Kahvaltı Burgeri ve Çıtır Patates)",
+  "note": "Kısa özet",
+  "recommendedItemIds": ["id1", "id2", "id3"],
+  "companionMessage": "Fotoğraftaki görsel bileşenlere ve tercihlerine göre neden bu menü alternatiflerini eşleştirdiğini anlatan sıcak ve samimi 1-2 cümle",
+  "followups": ["kısa takip önerisi", "kısa takip önerisi"]
 }
 
-Fotoğrafta yemek yoksa isFood false döndür, diğer alanları boş bırak.
-Alerjen ve diyet tercihlerine kesinlikle uy.
-Kullanıcıya "sen" diye hitap et, "siz" kullanma. companionMessage kısa olsun,
-fotoğrafta ne gördüğünü tekrar etme — sadece neden bu seçenekleri seçtiğini söyle.`;
+Eğer fotoğrafta kesinlikle yiyecek/içecek yoksa isFood: false döndür.`;
 
   const payload = {
     contents: [{
@@ -1410,7 +1415,7 @@ fotoğrafta ne gördüğünü tekrar etme — sadece neden bu seçenekleri seçt
       ]
     }],
     generationConfig: {
-      temperature: 0.4,
+      temperature: 0.3,
       thinkingConfig: { thinkingLevel: "low" },
       maxOutputTokens: 900,
       responseMimeType: "application/json"
@@ -1452,12 +1457,25 @@ fotoğrafta ne gördüğünü tekrar etme — sadece neden bu seçenekleri seçt
 
     const results = [];
     (parsed.recommendedItemIds || []).forEach(id => {
-      const found = catalog.find(x => x.itemId === id) ||
-                    buildMenuCatalog().find(x => x.itemId === id);
-      if (found) results.push({ ...found, reason: parsed.companionMessage || "Fotoğrafındaki lezzete yakın." });
+      const found = allCatalog.find(x => x.itemId === id || x.itemName.toLowerCase() === (id || "").toLowerCase());
+      if (found && !results.some(r => r.itemId === found.itemId)) {
+        results.push({ ...found, reason: parsed.companionMessage || "Fotoğraftaki lezzete yakın seçim." });
+      }
     });
 
-    console.log("🍽️ [Orbit AI] Görsel arama:", parsed);
+    // Eğer model ID'leri eksik döndüyse dishName üzerinden katalog eşleşmesi yap
+    if (results.length === 0 && parsed.dishName) {
+      const fallbackSearch = aiSearch(parsed.dishName);
+      if (fallbackSearch && fallbackSearch.length) {
+        fallbackSearch.slice(0, 3).forEach(f => {
+          if (!results.some(r => r.itemId === f.itemId)) {
+            results.push({ ...f, reason: parsed.companionMessage || "Görseldeki lezzete en yakın alternatif." });
+          }
+        });
+      }
+    }
+
+    console.log("🍽️ [Orbit AI] Görsel arama çıkarımı:", parsed, results);
     return {
       isFood: parsed.isFood !== false,
       dishName: parsed.dishName || "",

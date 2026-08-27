@@ -3915,12 +3915,16 @@ async function handlePhotoSearch(file) {
     ? seen.results
     : aiSearch("doyurucu");
 
+  let responseText = "Fotoğraftaki lezzete en yakın seçenekler:";
+  if (seen && seen.companionMessage) {
+    responseText = seen.companionMessage;
+  } else if (seen && seen.dishName) {
+    responseText = `Fotoğrafta <strong>${seen.dishName}</strong> görüyorum. Buna en yakın menü seçeneklerini senin için derledim:`;
+  }
+
   STATE.chatMessages.push({
     role: "assistant",
-    text: seen && seen.dishName
-      // note ile companionMessage aynı şeyi söylüyordu; tek cümle yeter
-      ? `Fotoğrafta <strong>${seen.dishName}</strong> görüyorum. ${seen.companionMessage || "Buna en yakın seçenekler:"}`
-      : "Fotoğraftaki lezzete en yakın seçenekler:",
+    text: responseText,
     groups: buildResultGroups(results),
     followups: (seen && seen.followups && seen.followups.length)
       ? seen.followups

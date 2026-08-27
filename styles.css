@@ -5304,12 +5304,18 @@ body {
 .tier-modal-content:has(.prominent-loyalty-card.full-bleed) > .tier-modal-body {
   background: #ffffff;
   margin: 0 -18px -22px;
-  padding: 16px 18px 22px;
+  /* Üst dolgu ve üst köşe yarıçapı YOK: lacivert statü kartı sheet'in
+     tepesinden başlamalı. Aksi halde kartın üstünde 16px beyaz şerit ve
+     köşelerde beyaz kıvrım kalıyordu (üç tier'de de aynı sorun). */
+  padding: 0 18px 22px;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  border-radius: 24px 24px 0 0;
+  border-radius: 0;
 }
+/* Kartın altındaki içerik nefesini kart kendi alt boşluğuyla verir */
+.tier-modal-content:has(.prominent-loyalty-card.full-bleed) > .tier-modal-body
+  > .prominent-loyalty-card.full-bleed { margin-bottom: 16px; }
 
 /* Gecikme telafisi: aksiyon değil, olmuş bitmiş bir bilgi */
 .eds-comp {
