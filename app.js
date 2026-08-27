@@ -786,11 +786,6 @@ function renderHome() {
       <div class="search-bar hero-search" id="openSearch">
         <span class="icon search-glass"><svg width="17" height="17" viewBox="0 0 24 24"><use href="#icon-search"/></svg></span>
         <input id="searchInput" placeholder="Restoran veya yemek ara" />
-        <button class="search-cam-btn" id="searchCam" title="Fotoğrafla ara" aria-label="Fotoğrafla ara">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 8.5h3l1.4-2h7.2L17 8.5h3v10H4v-10Z"/><circle cx="12" cy="13" r="3.2"/>
-          </svg>
-        </button>
         <button class="ask-ai-btn" id="askAiBtn" title="Orbit AI'a sor">✦ Sor</button>
       </div>
 
@@ -1003,11 +998,7 @@ function renderHome() {
     if (e.key === "Enter" && input.value.trim()) runAiSearch(input.value.trim());
   });
   document.getElementById("openSearch").addEventListener("click", (e) => {
-    if (!e.target.closest("#askAiBtn") && !e.target.closest("#searchCam")) input.focus();
-  });
-  document.getElementById("searchCam").addEventListener("click", (e) => {
-    e.stopPropagation();
-    openPhotoSearch();
+    if (!e.target.closest("#askAiBtn")) input.focus();
   });
   document.getElementById("askAiBtn").addEventListener("click", (e) => {
     e.stopPropagation();
