@@ -2575,7 +2575,7 @@ function showEtaBreakdown() {
           <span>Tahmini teslim</span>
           <strong>${deliveryClock()} · ${rem} dk</strong>
         </div>
-        <p class="ebd-note">Güzergâhtaki yoğunluk ve hava koşulları nedeniyle siparişinde ${d.delayMin} dakika gecikme yaşanıyor.</p>
+        <p class="ebd-note">Güzergâhtaki yoğunluk ve hava koşulları nedeniyle siparişinde ${rem} dakika gecikme yaşanıyor.</p>
       </div>
     `;
   }, 200 + lines.length * 420 + 260);
