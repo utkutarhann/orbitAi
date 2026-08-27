@@ -241,12 +241,9 @@ GÖREVİN:
   "followups": ["Daha uygun fiyatlı alternatifler", "Yanına içecek öner"]
 }`;
 
-  /* Bu anahtarda ListModels ile doğrulanmış, generateContent'e cevap veren modeller.
-     gemini-1.5-* ve gemini-2.0-* emekliye ayrıldı (404); gemini-2.5-flash ise
-     "no longer available to new users" diyor. Çalışan: gemini-3.6-flash. */
   const modelEndpoints = [
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
   ];
 
   const payload = {
@@ -1097,14 +1094,13 @@ Yalnızca şu JSON'u döndür:
   const payload = {
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     generationConfig: {
-      temperature: 0.6,
-      thinkingConfig: { thinkingLevel: "low" },
+      temperature: 0.4,
       maxOutputTokens: 700,
       responseMimeType: "application/json"
     }
   };
 
-  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 12000);
@@ -1293,13 +1289,12 @@ JSON Alanları:
     }],
     generationConfig: {
       temperature: 0.2,
-      thinkingConfig: { thinkingLevel: "low" },
       maxOutputTokens: 500,
       responseMimeType: "application/json"
     }
   };
 
-  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
@@ -1414,14 +1409,13 @@ Eğer fotoğrafta kesinlikle yiyecek/içecek yoksa isFood: false döndür.`;
       ]
     }],
     generationConfig: {
-      temperature: 0.3,
-      thinkingConfig: { thinkingLevel: "low" },
+      temperature: 0.2,
       maxOutputTokens: 900,
       responseMimeType: "application/json"
     }
   };
 
-  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
