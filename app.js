@@ -1196,8 +1196,7 @@ function tierConditionsHTML(tier) {
           "Orbit Mart'ta hesap aç",
           g.martAccountOpen ? "Tamamlandı" : "Base için zorunlu")
       + barRow({
-          title: "Son 3 ayda en az 2.500 TL harcama yap",
-          info: "Orbit Eats ve Orbit Mart içerisinde yaptığın toplam harcama tutarı",
+          title: "Son 3 ayda Orbit Eats'ten en az 2.500 TL harcama yap",
           now: spend.totalAnyMethod, target: BASE_ACTIVITY_THRESHOLD,
           fmt: money, leftLabel: (n) => `${tl(n)} daha harcaman gerekiyor`
         });
@@ -1214,8 +1213,7 @@ function tierConditionsHTML(tier) {
           leftLabel: (n) => `${n} sipariş daha vermen gerekiyor`
         })
       + barRow({
-          title: `Son 3 ayda toplam ${TIER_THRESHOLDS.Plus.minSpend90d.toLocaleString("tr-TR")} TL harcama yap`,
-          info: "Orbit Eats ve Orbit Mart içerisinde yaptığın toplam harcama tutarı",
+          title: `Son 3 ayda Orbit Eats'ten ${TIER_THRESHOLDS.Plus.minSpend90d.toLocaleString("tr-TR")} TL harcama yap`,
           now: spend.totalAnyMethod, target: TIER_THRESHOLDS.Plus.minSpend90d,
           fmt: money, leftLabel: moneyLeft
         });
@@ -1227,8 +1225,7 @@ function tierConditionsHTML(tier) {
       "Orbit Pay'den cüzdanına otomatik yükleme talimatı ver",
       standing ? "Tamamlandı" : "Sipariş tutarı cüzdan bakiyenden yüksek olduğunda eksik tutar kayıtlı kartından tamamlanır.")
     + barRow({
-        title: `Son 3 ayda toplam ${TIER_THRESHOLDS.Prime.minSpend90d.toLocaleString("tr-TR")} TL harcama yap`,
-        info: "Orbit Eats ve Orbit Mart içerisinde yaptığın toplam harcama tutarı",
+        title: `Son 3 ayda Orbit Eats'ten ${TIER_THRESHOLDS.Prime.minSpend90d.toLocaleString("tr-TR")} TL harcama yap`,
         now: spend.totalAnyMethod, target: TIER_THRESHOLDS.Prime.minSpend90d,
         fmt: money, leftLabel: moneyLeft
       })
@@ -1593,9 +1590,11 @@ function renderPreferences() {
 function searchStaticCatalog(query) {
   if (!query || !query.trim()) return [];
   const qNorm = (typeof normalizeTerm === "function" ? normalizeTerm(query) : query.toLowerCase().trim());
-  const terms = qNorm.split(/\s+/).filter(t => t.length >= 2);
-  const results = [];
+  const stopWords = new Set(["ve", "ya", "de", "da", "bu", "su", "ile", "icin", "bir", "sey", "var", "yok", "ara", "ben", "sen", "ama", "cok", "daha", "en", "nasil", "ne", "mi", "mu", "mü"]);
+  const terms = qNorm.split(/\s+/).filter(t => t.length >= 3 && !stopWords.has(t));
+  if (terms.length === 0 && qNorm.length < 3) return [];
 
+  const results = [];
   const rests = (STATE.restaurants && STATE.restaurants.length) ? STATE.restaurants : (typeof RESTAURANTS !== "undefined" ? RESTAURANTS : []);
 
   rests.forEach(r => {
@@ -1603,14 +1602,18 @@ function searchStaticCatalog(query) {
     const rCuisine = typeof normalizeTerm === "function" ? normalizeTerm(r.cuisine) : r.cuisine.toLowerCase();
     const rTags = typeof normalizeTerm === "function" ? normalizeTerm((r.tags || []).join(" ")) : (r.tags || []).join(" ").toLowerCase();
 
-    const isRestMatch = rName.includes(qNorm) || qNorm.includes(rName) || terms.some(t => rName.includes(t) || rCuisine.includes(t) || rTags.includes(t));
+    // Restoran adı tam veya anlamlı kelime bazında eşleşiyor mu?
+    const isRestExact = rName.includes(qNorm) || (qNorm.length >= 4 && rName.split(/\s+/).some(t => t.length >= 4 && qNorm.includes(t)));
+    const isRestMatch = isRestExact || (terms.length > 0 && terms.some(t => t.length >= 3 && (rName.includes(t) || rCuisine.includes(t))));
 
     (r.menu || []).forEach(m => {
       const mName = typeof normalizeTerm === "function" ? normalizeTerm(m.name) : m.name.toLowerCase();
       const mIng = typeof normalizeTerm === "function" ? normalizeTerm((m.ingredients || []).join(" ")) : (m.ingredients || []).join(" ").toLowerCase();
       const mTags = typeof normalizeTerm === "function" ? normalizeTerm((m.tags || []).join(" ")) : (m.tags || []).join(" ").toLowerCase();
 
-      const isMenuMatch = isRestMatch || mName.includes(qNorm) || qNorm.includes(mName) || terms.some(t => mName.includes(t) || mIng.includes(t) || mTags.includes(t));
+      const isMenuMatch = mName.includes(qNorm) ||
+        (terms.length > 0 && terms.some(t => t.length >= 3 && (mName.includes(t) || mTags.includes(t)))) ||
+        (isRestExact && isRestMatch);
 
       if (isMenuMatch) {
         results.push({
@@ -1636,8 +1639,18 @@ function searchStaticCatalog(query) {
 function runAiSearch(query) {
   resetScreenChrome();
   STATE.lastQuery = query;
-  const staticResults = searchStaticCatalog(query);
-  const results = staticResults.length > 0 ? staticResults : aiSearch(query);
+  
+  // Önce statik katalog araması yap
+  let results = searchStaticCatalog(query);
+  
+  // Eğer doğrudan menü/restoran adı eşleşmediyse, AI niyet süzgecinden geçir
+  if (results.length === 0) {
+    const aiResults = aiSearch(query);
+    if (aiResults && aiResults.length > 0) {
+      results = aiResults;
+    }
+  }
+
   STATE.lastSearchResults = results;
   renderSearchResults(results, query);
 }
@@ -1657,15 +1670,21 @@ function renderSearchResults(results, query) {
         <button class="back-btn" id="back">‹</button>
         <div>
           <p class="screen-title">${results.length === 0 ? "Arama Sonuçları" : "Senin için seçtim"}</p>
-          <p class="screen-subtitle">"${query}"</p>
+          <p class="screen-subtitle">"${escapeHtml(query)}"</p>
         </div>
       </div>
       ${results.length === 0 ? `
         <div class="empty-search-state">
           <div class="ess-icon">🔍</div>
-          <p class="ess-title">Arama kriterlerinize uygun bir sonuç bulunamadı</p>
-          <p class="ess-sub">Orbit Eats şu an yalnızca restoran ve yemek siparişleri için hizmet vermektedir. Lütfen restoran, mutfak veya yemek adı (örn: Burger, Kebap, Pizza, Mantı) girerek tekrar deneyiniz.</p>
-          <button class="btn-primary" id="essBack">Keşfetmeye devam et</button>
+          <p class="ess-title">"${escapeHtml(query)}" için sonuç bulunamadı</p>
+          <p class="ess-sub">Aradığın lezzeti klasik menüde bulamadık. Ne yemek istediğini tarif edebilir veya Orbit AI asistanına sorabilirsin.</p>
+          <div class="ess-action-group">
+            <button class="btn-primary ask-orbit-ai-btn" id="essAskAi">
+              <svg width="16" height="16" viewBox="0 0 48 48" style="fill:currentColor"><use href="#icon-spark"/></svg>
+              Orbit AI'a Sor
+            </button>
+            <button class="btn-secondary" id="essBack">Menüyü Keşfet</button>
+          </div>
         </div>
       ` : ""}
       ${groups.map(g => `
@@ -1701,6 +1720,12 @@ function renderSearchResults(results, query) {
   document.getElementById("back").addEventListener("click", renderHome);
   const essBack = document.getElementById("essBack");
   if (essBack) essBack.addEventListener("click", renderHome);
+  const essAskAi = document.getElementById("essAskAi");
+  if (essAskAi) {
+    essAskAi.addEventListener("click", () => {
+      openContextualChat(query, true);
+    });
+  }
   document.querySelectorAll("[data-restaurant]").forEach(el => {
     el.addEventListener("click", () => openRestaurant(el.dataset.restaurant, el.dataset.item));
   });

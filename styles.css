@@ -1546,6 +1546,49 @@ body {
   margin: 0 0 20px;
   font-weight: 500;
 }
+.ess-action-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  max-width: 280px;
+  margin: 0 auto;
+}
+.btn-primary.ask-orbit-ai-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 20px;
+  background: linear-gradient(135deg, #00d285 0%, #00b06f 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 210, 133, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-primary.ask-orbit-ai-btn:active {
+  transform: scale(0.98);
+}
+.btn-secondary {
+  width: 100%;
+  padding: 11px 18px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn-secondary:active {
+  background: #e2e8f0;
+}
 
 .issue-card {
   background: var(--orbit-amber-soft); border: 1.5px solid #ffd4a8; border-radius: var(--radius-lg);
