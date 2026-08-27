@@ -1421,17 +1421,21 @@ function renderPreferences() {
 
             <div class="tier-rules-card" style="margin-top:14px">
               <div class="tier-rules-header" id="toggleTierRules">
-                <h4>ℹ️ Bilgilendirme</h4>
+                <h4>ℹ️ Şartlar ve Koşullar</h4>
                 <span class="tier-rules-arrow" id="tierRulesArrow">▾</span>
               </div>
-              <ul id="tierRulesContent" style="display:none; margin-top:10px;">
-                <li>Nakit iadeler doğrudan <strong>Orbit Pay bakiyene</strong> yatar.</li>
-                <li>Kullanıcıların bir üst segmentteki şartları sağlaması halinde, beklemeye gerek kalmadan üst segmente geçişi olacaktır. Alt segmente düşüş değerlendirmesi <strong>3 aylık periyot sonunda</strong> yapılır.</li>
-                <li>Nakit iade yalnızca <strong>Orbit Pay ile yapılan harcamalarda</strong> yüklenir.</li>
-                <li>Nakit iadeler <strong>devredilemez</strong> ve nakit olarak transfer edilemez.</li>
-                <li>Sadakat programı başladığı anda kullanıcılar <strong>ilave bir işlem yapmaksızın</strong> mevcut durumlarına göre ilgili segmentasyona geçer.</li>
-                <li>Orbit Eats, işbu programın detay ve koşullarını <strong>tek taraflı olarak</strong> değiştirebilir; segmentasyonlara yeni görevler ekleyebilir ve farklı avantajlar sağlayabilir.</li>
-              </ul>
+              <div id="tierRulesContent" style="display:none; margin-top:10px;">
+                <p class="tier-rules-intro" style="font-size:11.8px; color:var(--orbit-ink); line-height:1.55; margin:0 0 10px 0; font-weight:600;">Sadakat Programı kapsamında Orbit Eats tarafından 3 kullanıcı segmentasyonu oluşturulmuştur. Her bir segmentasyon farklı şartlar içermektedir. Bu şartları sağlayan Orbit Eats kullanıcıları, dahil olduğu segmentasyona özel faydalara hak kazanmaktadır.</p>
+                <ul style="padding-left:16px; margin:0; display:flex; flex-direction:column; gap:5px;">
+                  <li>Nakit iadeler doğrudan <strong>Orbit Pay bakiyene</strong> yatar.</li>
+                  <li>Kullanıcıların bir üst segmentteki şartları sağlaması halinde, beklemeye gerek kalmadan üst segmente geçişi olacaktır. Alt segmente düşüş değerlendirmesi <strong>3 aylık periyot sonunda</strong> yapılır.</li>
+                  <li>Nakit iade yalnızca <strong>Orbit Pay ile yapılan harcamalarda</strong> yüklenir.</li>
+                  <li>Nakit iadeler <strong>devredilemez</strong> ve nakit olarak transfer edilemez.</li>
+                  <li>Kampanya ve avantajlardan sadece <strong>gerçek kişiler</strong> faydalanabilir, tüzel kişiler faydalanamaz.</li>
+                  <li>Sadakat programı başladığı anda kullanıcılar <strong>ilave bir işlem yapmaksızın</strong> mevcut durumlarına göre ilgili segmentasyona geçer.</li>
+                  <li>Orbit Eats, işbu programın detay ve koşullarını <strong>tek taraflı olarak</strong> değiştirebilir; segmentasyonlara yeni görevler ekleyebilir ve farklı avantajlar sağlayabilir.</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
