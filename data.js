@@ -1155,7 +1155,7 @@ const RESTAURANTS = [
     "id": "r23",
     "name": "Çınar Börek & Güveç",
     "cuisine": "Kahvaltı & Börek",
-    "image": "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=500&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=500&auto=format&fit=crop&q=80",
     "rating": 4.0,
     "deliveryMinutes": 20,
     "distanceKm": 1.5,
@@ -1170,7 +1170,7 @@ const RESTAURANTS = [
       {
         "id": "m45",
         "name": "Kıymalı Su Böreği",
-        "image": "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=500&auto=format&fit=crop&q=80",
+        "image": "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=500&auto=format&fit=crop&q=80",
         "price": 220,
         "ingredients": [
           "yufka",
@@ -1193,7 +1193,7 @@ const RESTAURANTS = [
       {
         "id": "m46",
         "name": "Peynirli Börek",
-        "image": "https://images.unsplash.com/photo-1573140247632-f8fd74997d5c?w=500&auto=format&fit=crop&q=80",
+        "image": "https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=500&auto=format&fit=crop&q=80",
         "price": 185,
         "ingredients": [
           "yufka",
