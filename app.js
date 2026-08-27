@@ -1251,7 +1251,7 @@ function tierBenefitsHTML(tier) {
   const delivery = tier === "Prime"
     ? item("👑", "Her zaman ücretsiz teslimat", "Tüm siparişlerde ücretsiz teslimat.")
     : tier === "Plus"
-      ? item("🍔", `${tl(PLUS_FREE_DELIVERY_MIN)} üzeri ücretsiz teslimat`, `Orbit Pay ile yapılan ${tl(PLUS_FREE_DELIVERY_MIN)} ve üzeri Eats ve Mart alışverişlerinde teslimat ücretsiz.`)
+      ? item("🍔", `${tl(PLUS_FREE_DELIVERY_MIN)} üzeri ücretsiz teslimat`, `Orbit Pay ile yapılan ${tl(PLUS_FREE_DELIVERY_MIN)} ve üzeri Eats alışverişlerinde teslimat ücretsiz.`)
       : "";
 
   const extras = tier === "Prime"
