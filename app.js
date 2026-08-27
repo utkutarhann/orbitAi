@@ -1699,9 +1699,18 @@ function renderSearchResults(results, query) {
             const tier = currentTier();
             const pct = CASHBACK_RATES[tier].eats;
             const cashbackTRY = Math.round((r.price || 0) * pct * 100) / 100;
+            let img = r.image;
+            if (!img) {
+              const allR = (STATE.restaurants && STATE.restaurants.length) ? STATE.restaurants : (typeof RESTAURANTS !== "undefined" ? RESTAURANTS : []);
+              allR.forEach(rest => {
+                const found = (rest.menu || []).find(m => m.name === r.itemName || m.id === r.itemId);
+                if (found && found.image) img = found.image;
+                if (!img && rest.id === r.restaurantId) img = rest.image;
+              });
+            }
             return `
               <div class="result-card" data-item="${r.itemId}" data-restaurant="${r.restaurantId}">
-                ${foodIconTile(r.tags)}
+                ${foodIconTile(r.tags, img)}
                 <div class="result-body">
                   <div class="result-title-row">
                     <p class="result-name">${r.itemName}</p>
