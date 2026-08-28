@@ -174,7 +174,8 @@ ${isFollowupTurn
 - Seçili Senaryo / Periyot: ${ctx.label}
 - Doğru Zaman Hitabı: "${ctx.greeting}" (${ctx.timeOfDayName})
 - Ortam / Atmosfer: ${ctx.weather}
-- ÖNEMLİ ZAMAN KURALI: Konuşmanda kesinlikle şu anki zaman dilimine (${ctx.timeOfDayName}) ve senaryoya sadık kal.
+- ÖNEMLİ ZAMAN & ÖĞÜN KURALI: Konuşmanda kesinlikle şu anki zaman dilimine (${ctx.timeOfDayName}) ve senaryoya sadık kal.
+${ctx.segment === "sabah" ? `* SABAH SAATLERİ KURALI: Şu anda Sabah / Kahvaltı vakti. Kullanıcı genel bir açlık, doyuruculuk veya yemek talebinde bulunduğunda ("doyurucu bir şeyler istiyorum", "açım", "ne yesem" vb.), akşam ana yemekleri (kebap, lahmacun, pizza, sushi, güveç vb.) yerine SABAH KAHVALTISINA UYGUN doyurucu kahvaltılıkları (Kıymalı Su Böreği, Burger Kahvaltı, Sarıyer Su Böreği, Kahvaltı Wrap vb.) öner ve "Güne doyurucu ve enerjik bir kahvaltıyla başlaman için lezzetli seçenekler hazırladım" şeklinde sabah vurgusu yap!` : ""}
   Örneğin sabahsa SAKIN "bu akşam", "gece", "yağmurlu akşam" deme! Sabahsa "sabah/bu sabah", öğleyse "öğle arası/bu öğlen", akşamsa "bu akşam", doğum günüyse "doğum günün kutlu olsun", maç günüyse "maç heyecanı" vurgusu yap.
 
 Kullanıcı Profili ve Tercihleri:
@@ -462,6 +463,23 @@ function fallbackLocalAi(query) {
       results: [],
       martHandoff: null,
       followups: getScenarioFollowups(ctx.segment)
+    };
+  }
+
+  if (ctx.segment === "sabah" && /doyurucu|aç|ac |ne yesem|kahvalti|kahvaltı|sabah|kahvaltilik/i.test(query) && !/kebap|lahmacun|pizza|döner|burger menü/i.test(query)) {
+    const catalog = buildMenuCatalog();
+    const breakfastItems = catalog.filter(x => (x.tags || []).some(t => /kahvalti|borek|wrap/.test(t)) || /kahvaltı|börek|su böreği|poşe yumurta/i.test(x.itemName)).slice(0, 4);
+    return {
+      isRealAi: false,
+      intent: "food",
+      thinkingSteps: [
+        "Sabah kahvaltısı ve güne enerjik başlama seçenekleri sorgulanıyor.",
+        "Doyurucu börek ve kahvaltılık alternatifler filtreleniyor…"
+      ],
+      companionMessage: "Günaydın Baki! Güne enerjik ve doyurucu bir başlangıç yapman için fırından yeni çıkmış sıcak börekler ve zengin kahvaltı seçeneklerini senin için derledim:",
+      results: breakfastItems.length ? breakfastItems : aiSearch(query),
+      martHandoff: getMartHandoff("kahvalti"),
+      followups: ["Sıcak fırın simit & çay ☕", "Hafif kahvaltı alternatifleri 🥐"]
     };
   }
 
@@ -912,6 +930,21 @@ function scoreItem(item, signals, query) {
   }
 
   score += ((item.rating || 4) - 4) * 1.5;
+
+  const ctx = (typeof getLiveScenarioContext === "function") ? getLiveScenarioContext() : { segment: null, currentHour: 12 };
+  const isMorning = ctx.segment === "sabah" || (ctx.currentHour >= 5 && ctx.currentHour < 11);
+  const isGenericHunger = !kw.score || /doyurucu|aç|ac |ne yesem|oner|öner|bir şeyler|yiyecek|yemek|kahvaltı|kahvalti/i.test(query || "");
+
+  if (isMorning && isGenericHunger) {
+    const isBreakfast = (item.tags || []).some(t => /kahvalti|borek|wrap/.test(t)) || /kahvaltı|börek|su böreği|poşe yumurta/i.test(item.itemName);
+    if (isBreakfast) {
+      score += 7;
+      reasons.push("sabah kahvaltısına uygun doyurucu lezzet");
+    } else if (/kebap|lahmacun|döner|doner|pizza|sushi|makarna|güveç|musakka/i.test((item.tags || []).join(" ") + " " + item.itemName)) {
+      score -= 4; // Sabah saatlerinde genel açlık aramalarında akşam ana yemeklerini geriye at
+    }
+  }
+
   return { score, reasons, hasAvoidedAllergen, kwScore: kw.score };
 }
 
